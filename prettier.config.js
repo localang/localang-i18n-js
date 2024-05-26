@@ -6,10 +6,10 @@
  * @type {import('prettier').Options}
  */
 const options = {
-  bracketSameLine: true,
-  quoteProps: 'consistent',
-  singleQuote: true,
-  trailingComma: 'all',
+    bracketSameLine: true,
+    quoteProps: 'consistent',
+    singleQuote: true,
+    trailingComma: 'all',
 };
 
 module.exports = options;
