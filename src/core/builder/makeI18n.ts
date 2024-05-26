@@ -5,17 +5,17 @@ type MakeI18nResponse = (key: string) => string;
 
 /**
  * Creates function to work with translations.
+ * @param lang - Current app language
  * @param keyset - Translations keyset
  * @param placeholders - Placeholders and its values
  * @returns - Function to work with translations.
  */
 export const makeI18n = (
+    lang: Lang,
     keyset: Keyset,
     placeholders?: Record<string, string | number>,
 ): MakeI18nResponse => {
     return (key: string) => {
-        const lang: Lang = 'ar'; // TODO: get from context
-
         const translations = keyset[key];
 
         if (!translations) {
