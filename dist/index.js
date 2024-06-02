@@ -107,6 +107,16 @@ var Api = /** @class */ (function () {
     return Api;
 }());
 
+/**
+ * Checks if the given text contains a plural placeholder.
+ * A plural placeholder is defined as a string that starts with 'count' followed by an optional number.
+ * @param text  The text to check for plural placeholders.
+ * @returns     true if the text contains a plural placeholder, false otherwise.
+ */
+var isPlural = function (text) {
+    return /\bcount\d*\b/.test(text);
+};
+
 // TODO: comments
 function loadKeyset(fileName) {
     if (fs.existsSync(fileName)) {
@@ -120,7 +130,9 @@ function saveKeyset(fileName, keyset) {
     fs.writeFileSync(fileName, "export const keyset = ".concat(JSON.stringify(keyset, null, 4), ";\n"));
 }
 function removeKeyset(fileName) {
-    fs.unlinkSync(fileName);
+    if (fs.existsSync(fileName)) {
+        fs.unlinkSync(fileName);
+    }
 }
 var createGenerateI18nFileRule = function (_a) {
     var keyLanguage = _a.keyLanguage, langs = _a.langs, fileExt = _a.fileExt;
@@ -132,7 +144,7 @@ var createGenerateI18nFileRule = function (_a) {
                     var _a, _b;
                     if ('name' in node.callee &&
                         ((_a = node.callee) === null || _a === void 0 ? void 0 : _a.name) === 'i18n' &&
-                        node.arguments.length === 1 &&
+                        node.arguments.length >= 1 &&
                         ((_b = node.arguments[0]) === null || _b === void 0 ? void 0 : _b.type) === 'Literal' &&
                         typeof node.arguments[0].value === 'string') {
                         usedKeys.add(node.arguments[0].value);
@@ -145,11 +157,18 @@ var createGenerateI18nFileRule = function (_a) {
                     var updatedKeyset = __assign({}, existingKeyset);
                     usedKeys.forEach(function (key) {
                         if (!updatedKeyset[key]) {
-                            // TODO: is plural
+                            var isKeyPlural_1 = isPlural(key);
                             updatedKeyset[key] = {};
                             langs.forEach(function (lang) {
-                                updatedKeyset[key][lang] =
-                                    lang === keyLanguage ? key : '';
+                                var translation = lang === keyLanguage ? key : '';
+                                updatedKeyset[key][lang] = isKeyPlural_1 ? {
+                                    zero: translation,
+                                    one: translation,
+                                    two: translation,
+                                    few: translation,
+                                    many: translation,
+                                    other: translation,
+                                } : translation;
                             });
                         }
                     });

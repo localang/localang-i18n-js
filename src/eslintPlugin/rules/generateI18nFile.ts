@@ -1,6 +1,7 @@
 import type { Rule } from 'eslint';
 import fs from 'fs';
 import type { Config } from '../index';
+import { isPlural } from '../../helpers/string/isPlural';
 
 // TODO: comments
 
@@ -23,7 +24,9 @@ function saveKeyset(fileName: string, keyset: Record<string, unknown>) {
 }
 
 function removeKeyset(fileName: string) {
-    fs.unlinkSync(fileName);
+    if (fs.existsSync(fileName)) {
+        fs.unlinkSync(fileName);
+    }
 }
 
 export const createGenerateI18nFileRule = ({
@@ -39,7 +42,7 @@ export const createGenerateI18nFileRule = ({
                 if (
                     'name' in node.callee &&
                     node.callee?.name === 'i18n' &&
-                    node.arguments.length === 1 &&
+                    node.arguments.length >= 1 &&
                     node.arguments[0]?.type === 'Literal' &&
                     typeof node.arguments[0].value === 'string'
                 ) {
@@ -57,12 +60,23 @@ export const createGenerateI18nFileRule = ({
 
                 usedKeys.forEach((key) => {
                     if (!updatedKeyset[key]) {
-                        // TODO: is plural
+                        const isKeyPlural = isPlural(key);
+
                         updatedKeyset[key] = {};
 
                         langs.forEach((lang) => {
-                            updatedKeyset[key][lang] =
-                                lang === keyLanguage ? key : '';
+                            const translation = lang === keyLanguage ? key : '';
+
+                            updatedKeyset[key][lang] = isKeyPlural
+                                ? {
+                                      zero: translation,
+                                      one: translation,
+                                      two: translation,
+                                      few: translation,
+                                      many: translation,
+                                      other: translation,
+                                  }
+                                : translation;
                         });
                     }
                 });

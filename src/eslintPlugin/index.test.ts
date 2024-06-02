@@ -61,7 +61,7 @@ describe('eslintPlugin/index', () => {
         const filePath = path.join(tempDir, 'test.js');
         await fs.promises.writeFile(filePath, code);
 
-        console.log(await eslint.lintFiles(filePath));
+        await eslint.lintFiles(filePath);
 
         const keyset = readKeyset('test.i18n.js');
         expect(keyset).toBeTruthy();
@@ -77,9 +77,33 @@ describe('eslintPlugin/index', () => {
         });
     });
 
+    it('should delete .i18n.js file then there is no keys left', async () => {
+        const initialCode = `i18n("some string");`;
+        const updatedCode = '';
+        const filePath = path.join(tempDir, 'delete-test.js');
+        await fs.promises.writeFile(filePath, initialCode);
+
+        await eslint.lintFiles(filePath);
+
+        const keyset = readKeyset('delete-test.i18n.js');
+        expect(keyset).toBeTruthy();
+        expect(keyset['some string']).toEqual({
+            en: 'some string',
+            es: '',
+            fr: '',
+        });
+
+        await fs.promises.writeFile(filePath, updatedCode);
+
+        await eslint.lintFiles([filePath]);
+
+        const updatedKeyset = readKeyset('delete-test.i18n.js');
+        expect(updatedKeyset).toBeNull();
+    });
+
     it('should delete key from .i18n.js file when i18n call is removed', async () => {
         const initialCode = `i18n('key to delete');`;
-        const updatedCode = ``;
+        const updatedCode = `i18n('other key');`;
         const filePath = path.join(tempDir, 'delete-test.js');
         await fs.promises.writeFile(filePath, initialCode);
 
@@ -121,6 +145,48 @@ describe('eslintPlugin/index', () => {
         });
         expect(keyset['third string']).toEqual({
             en: 'third string',
+            es: '',
+            fr: '',
+        });
+    });
+
+    it('should create plural version', async () => {
+        const code = `i18n('Items: {count}.'); i18n('second string');`;
+        const filePath = path.join(tempDir, 'plural-test.js');
+        await fs.promises.writeFile(filePath, code);
+
+        await eslint.lintFiles([filePath]);
+
+        const keyset = readKeyset('plural-test.i18n.js');
+        expect(keyset).toBeTruthy();
+        expect(keyset['Items: {count}.']).toEqual({
+            en: {
+                zero: 'Items: {count}.',
+                one: 'Items: {count}.',
+                two: 'Items: {count}.',
+                few: 'Items: {count}.',
+                many: 'Items: {count}.',
+                other: 'Items: {count}.',
+            },
+            es: {
+                zero: '',
+                one: '',
+                two: '',
+                few: '',
+                many: '',
+                other: '',
+            },
+            fr: {
+                zero: '',
+                one: '',
+                two: '',
+                few: '',
+                many: '',
+                other: '',
+            },
+        });
+        expect(keyset['second string']).toEqual({
+            en: 'second string',
             es: '',
             fr: '',
         });
