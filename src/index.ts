@@ -1,5 +1,5 @@
 import { Api } from './core';
 
-const api = new Api();
+export const { makeI18n, setSettings } = new Api();
 
-export default api;
+export { createEslintPlugin } from './eslintPlugin';

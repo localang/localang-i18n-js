@@ -1,0 +1,1 @@
+{"version":3,"file":"makeI18n.d.ts","sourceRoot":"","sources":["../../../src/core/builder/makeI18n.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,MAAM,EAAE,IAAI,EAAE,MAAM,SAAS,CAAC;AAG5C,KAAK,gBAAgB,GAAG,CAAC,GAAG,EAAE,MAAM,KAAK,MAAM,CAAC;AAEhD;;;;;;GAMG;AACH,eAAO,MAAM,QAAQ,SACX,IAAI,UACF,MAAM,iBACC,OAAO,MAAM,EAAE,MAAM,GAAG,MAAM,CAAC,KAC/C,gBAgCF,CAAC"}

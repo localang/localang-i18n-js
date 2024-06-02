@@ -6,16 +6,16 @@
  * @type {import('ts-jest').JestConfigWithTsJest}
  */
 const options = {
-  transform: {
-    '^.+\\.tsx?$': [
-      'ts-jest',
-      {
-        isolatedModules: true,
-        useESM: true
-      },
-    ],
-  },
-  resolver: 'ts-jest-resolver'
+    transform: {
+        '^.+\\.tsx?$': [
+            'ts-jest',
+            {
+                isolatedModules: true,
+                useESM: true,
+            },
+        ],
+    },
+    resolver: 'ts-jest-resolver',
 };
 
 module.exports = options;

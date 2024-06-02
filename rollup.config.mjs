@@ -2,7 +2,7 @@
 
 import terser from '@rollup/plugin-terser';
 import typescript2 from 'rollup-plugin-typescript2';
-import packageJSON from './package.json' assert { type: 'json' };
+import packageJSON from './package.json' with { type: 'json' };
 
 /**
  * Comment with library information to be appended in the generated bundles.
