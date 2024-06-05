@@ -25,14 +25,28 @@ function readKeyset(fileName: string) {
     const filePath = path.join(tempDir, fileName);
 
     if (fs.existsSync(filePath)) {
-        return JSON.parse(
-            fs
-                .readFileSync(filePath, 'utf8')
-                .replace(/export const keyset = |;/g, ''),
-        );
+        let content = fs.readFileSync(filePath, 'utf8');
+
+        // remove keyset initialization
+        content = content.replace(/const keyset = |;/g, '');
+
+        // remove import
+        content = content.substring(content.indexOf('\n') + 1);
+
+        // remove export
+        content = content.substring(0, content.lastIndexOf('\n'));
+        content = content.substring(0, content.lastIndexOf('\n'));
+
+        console.log(content);
+
+        return JSON.parse(content);
     }
 
     return null;
+}
+
+function readFileContent(filePath: string) {
+    return fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : '';
 }
 
 describe('eslintPlugin/index', () => {
@@ -64,6 +78,8 @@ describe('eslintPlugin/index', () => {
         await eslint.lintFiles(filePath);
 
         const keyset = readKeyset('test.i18n.js');
+        const updatedContent = readFileContent(filePath);
+
         expect(keyset).toBeTruthy();
         expect(keyset['some string']).toEqual({
             en: 'some string',
@@ -75,6 +91,10 @@ describe('eslintPlugin/index', () => {
             es: '',
             fr: '',
         });
+
+        expect(updatedContent).toContain(
+            `import { i18n } from './test.i18n.js';`,
+        );
     });
 
     it('should delete .i18n.js file then there is no keys left', async () => {

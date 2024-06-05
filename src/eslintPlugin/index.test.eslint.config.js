@@ -16,7 +16,7 @@ const config = [
             }),
         },
         rules: {
-            'localang/generate-i18n-file': 'error', // TODO: is it mandatory?
+            'localang/generate-i18n-file': 'error',
         },
     },
 ];

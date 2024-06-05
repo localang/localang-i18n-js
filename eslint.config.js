@@ -2,7 +2,6 @@
 
 const { FlatCompat } = require('@eslint/eslintrc');
 const js = require('@eslint/js');
-const { createEslintPlugin } = require('./dist/index');
 
 const compat = new FlatCompat({ recommendedConfig: js.configs.recommended });
 
@@ -36,19 +35,6 @@ const config = [
             'types',
             '**/index.test.eslint.config.js',
         ],
-    },
-
-    // TODO: remove
-    {
-        plugins: {
-            localang: createEslintPlugin({
-                langs: ['en', 'ru'],
-                fileExt: 'ts',
-            }),
-        },
-        rules: {
-            'localang/generate-i18n-file': 'error', // TODO: is it mandatory?
-        },
     },
 ];
 

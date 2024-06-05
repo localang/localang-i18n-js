@@ -5,6 +5,7 @@
  */
 
 import fs from 'fs';
+import path from 'path';
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -116,27 +117,61 @@ var isPlural = function (text) {
 };
 
 // TODO: comments
+var moduleImportTemplate = 'import { makeI18n } from \'localang-i18n-js\';';
+var moduleExportTemplate = 'export const i18n = makeI18n(keyset);';
+var commonJSImportTemplate = 'const { makeI18n } = require(\'localang-i18n-js\');';
+var commonJSExportTemplate = 'module.exports = makeI18n(keyset);';
+var getModuleImportFromI18nFileTemplate = function (i18nFileName) { return "import { i18n } from './".concat(i18nFileName, "';"); };
+var getCommonJSImportFromI18nFileTemplate = function (i18nFileName) { return "const i18n = require('./".concat(i18nFileName, "');"); };
+var importExportTemplates = {
+    module: {
+        importT: moduleImportTemplate,
+        exportT: moduleExportTemplate,
+        getImportFromI18nFileT: getModuleImportFromI18nFileTemplate,
+    },
+    commonjs: {
+        importT: commonJSImportTemplate,
+        exportT: commonJSExportTemplate,
+        getImportFromI18nFileT: getCommonJSImportFromI18nFileTemplate,
+    },
+};
 function loadKeyset(fileName) {
     if (fs.existsSync(fileName)) {
-        return JSON.parse(fs
-            .readFileSync(fileName, 'utf8')
-            .replace(/export const keyset = |;/g, ''));
+        var content = fs.readFileSync(fileName, 'utf8');
+        // remove keyset initialization
+        content = content.replace(/const keyset = |;/g, '');
+        // remove import
+        content = content.substring(content.indexOf('\n') + 1);
+        // remove export
+        content = content.substring(0, content.lastIndexOf('\n'));
+        content = content.substring(0, content.lastIndexOf('\n'));
+        return JSON.parse(content);
     }
     return {};
 }
-function saveKeyset(fileName, keyset) {
-    fs.writeFileSync(fileName, "export const keyset = ".concat(JSON.stringify(keyset, null, 4), ";\n"));
+function saveKeyset(_a) {
+    var fileName = _a.fileName, keyset = _a.keyset, exportT = _a.exportT, importT = _a.importT;
+    fs.writeFileSync(fileName, "".concat(importT, "\n\nconst keyset = ").concat(JSON.stringify(keyset, null, 4), ";\n\n").concat(exportT, "\n"));
 }
 function removeKeyset(fileName) {
     if (fs.existsSync(fileName)) {
         fs.unlinkSync(fileName);
     }
 }
+function addI18nFileImportStatement(baseFile, importT) {
+    var content = fs.readFileSync(baseFile, 'utf8');
+    var importRegex = /import\s*\{\s*i18n\s*\}\s*from\s*['"]\..*\.i18n\.js['"]\s*;/;
+    var requireRegex = /const\s*{\s*i18n\s*}\s*=\s*require\s*\(['"]\..*\.i18n\.js['"]\)\s*;/;
+    if (!importRegex.test(content) && !requireRegex.test(content)) {
+        fs.writeFileSync(baseFile, importT + content);
+    }
+}
 var createGenerateI18nFileRule = function (_a) {
-    var keyLanguage = _a.keyLanguage, langs = _a.langs, fileExt = _a.fileExt;
+    var keyLanguage = _a.keyLanguage, langs = _a.langs, fileExt = _a.fileExt, importType = _a.importType;
     return ({
         create: function (context) {
             var usedKeys = new Set();
+            var _a = importExportTemplates[importType], importT = _a.importT, exportT = _a.exportT, getImportFromI18nFileT = _a.getImportFromI18nFileT;
             return {
                 'CallExpression': function (node) {
                     var _a, _b;
@@ -145,7 +180,9 @@ var createGenerateI18nFileRule = function (_a) {
                         node.arguments.length >= 1 &&
                         ((_b = node.arguments[0]) === null || _b === void 0 ? void 0 : _b.type) === 'Literal' &&
                         typeof node.arguments[0].value === 'string') {
-                        usedKeys.add(node.arguments[0].value);
+                        if (!context.filename.includes('.i18n.')) {
+                            usedKeys.add(node.arguments[0].value);
+                        }
                     }
                 },
                 'Program:exit': function () {
@@ -159,14 +196,16 @@ var createGenerateI18nFileRule = function (_a) {
                             updatedKeyset[key] = {};
                             langs.forEach(function (lang) {
                                 var translation = lang === keyLanguage ? key : '';
-                                updatedKeyset[key][lang] = isKeyPlural_1 ? {
-                                    zero: translation,
-                                    one: translation,
-                                    two: translation,
-                                    few: translation,
-                                    many: translation,
-                                    other: translation,
-                                } : translation;
+                                updatedKeyset[key][lang] = isKeyPlural_1
+                                    ? {
+                                        zero: translation,
+                                        one: translation,
+                                        two: translation,
+                                        few: translation,
+                                        many: translation,
+                                        other: translation,
+                                    }
+                                    : translation;
                             });
                         }
                     });
@@ -179,7 +218,13 @@ var createGenerateI18nFileRule = function (_a) {
                         removeKeyset(i18nFileName);
                     }
                     else {
-                        saveKeyset(i18nFileName, updatedKeyset);
+                        saveKeyset({
+                            fileName: i18nFileName,
+                            keyset: updatedKeyset,
+                            importT: importT,
+                            exportT: exportT,
+                        });
+                        addI18nFileImportStatement(context.filename, getImportFromI18nFileT(path.basename(i18nFileName)));
                     }
                 },
             };
@@ -191,7 +236,7 @@ var createGenerateI18nFileRule = function (_a) {
  * Creates ESLint plugin to generate I18n files.
  */
 var createEslintPlugin = function (_a) {
-    var _b = _a === void 0 ? {} : _a, _c = _b.keyLanguage, keyLanguage = _c === void 0 ? 'en' : _c, _d = _b.langs, langs = _d === void 0 ? ['en'] : _d, _e = _b.fileExt, fileExt = _e === void 0 ? 'js' : _e;
+    var _b = _a === void 0 ? {} : _a, _c = _b.keyLanguage, keyLanguage = _c === void 0 ? 'en' : _c, _d = _b.langs, langs = _d === void 0 ? ['en'] : _d, _e = _b.fileExt, fileExt = _e === void 0 ? 'js' : _e, _f = _b.importType, importType = _f === void 0 ? 'module' : _f;
     return ({
         // TODO: will it work instead of `ignores` in index.test.eslint.config.js
         configs: {
@@ -206,6 +251,7 @@ var createEslintPlugin = function (_a) {
                 keyLanguage: keyLanguage,
                 langs: langs,
                 fileExt: fileExt,
+                importType: importType,
             }),
         },
     });

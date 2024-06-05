@@ -17,9 +17,14 @@ export interface Config {
      * @default js
      */
     fileExt?: 'js' | 'ts';
+    /**
+     * Import/export type for i18n files
+     * @default module
+     */
+    importType?: 'module' | 'commonjs';
 }
 /**
  * Creates ESLint plugin to generate I18n files.
  */
-export declare const createEslintPlugin: ({ keyLanguage, langs, fileExt, }?: Config) => ESLint.Plugin;
+export declare const createEslintPlugin: ({ keyLanguage, langs, fileExt, importType, }?: Config) => ESLint.Plugin;
 //# sourceMappingURL=index.d.ts.map

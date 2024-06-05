@@ -2,40 +2,134 @@ import type { Rule } from 'eslint';
 import fs from 'fs';
 import type { Config } from '../index';
 import { isPlural } from '../../helpers/string/isPlural';
+import path from 'path';
 
 // TODO: comments
 
+const moduleImportTemplate = "import { makeI18n } from 'localang-i18n-js';";
+const moduleExportTemplate = 'export const i18n = makeI18n(keyset);';
+
+const commonJSImportTemplate =
+    "const { makeI18n } = require('localang-i18n-js');";
+const commonJSExportTemplate = 'module.exports = makeI18n(keyset);';
+
+const getModuleImportFromI18nFileTemplate = (i18nFileName: string) =>
+    `import { i18n } from './${i18nFileName}';\n`;
+const getCommonJSImportFromI18nFileTemplate = (i18nFileName: string) =>
+    `const i18n = require('./${i18nFileName}');\n`;
+
+const importExportTemplates = {
+    module: {
+        importT: moduleImportTemplate,
+        exportT: moduleExportTemplate,
+        getImportFromI18nFileT: getModuleImportFromI18nFileTemplate,
+    },
+    commonjs: {
+        importT: commonJSImportTemplate,
+        exportT: commonJSExportTemplate,
+        getImportFromI18nFileT: getCommonJSImportFromI18nFileTemplate,
+    },
+};
+
+/**
+ * Trying to parse i18n file.
+ * @param fileName - Name of i18n file
+ * @returns Parsed keyset or empty object
+ */
 function loadKeyset(fileName: string) {
     if (fs.existsSync(fileName)) {
-        return JSON.parse(
-            fs
-                .readFileSync(fileName, 'utf8')
-                .replace(/export const keyset = |;/g, ''),
-        );
+        let content = fs.readFileSync(fileName, 'utf8');
+
+        // remove keyset initialization
+        content = content.replace(/const keyset = |;/g, '');
+
+        // remove import
+        content = content.substring(content.indexOf('\n') + 1);
+
+        // remove export
+        content = content.substring(0, content.lastIndexOf('\n'));
+        content = content.substring(0, content.lastIndexOf('\n'));
+
+        return JSON.parse(content);
     }
+
     return {};
 }
 
-function saveKeyset(fileName: string, keyset: Record<string, unknown>) {
+/**
+ * Saves keyset to i18n file.
+ * @param fileName - Name of i18n file
+ * @param keyset - Translations
+ * @param exportT - String with export of keyset
+ * @param importT - String with import of makeI18n function
+ */
+function saveKeyset({
+    fileName,
+    keyset,
+    exportT,
+    importT,
+}: {
+    fileName: string;
+    keyset: Record<string, unknown>;
+    importT: string;
+    exportT: string;
+}) {
     fs.writeFileSync(
         fileName,
-        `export const keyset = ${JSON.stringify(keyset, null, 4)};\n`,
+        `${importT}\n\nconst keyset = ${JSON.stringify(
+            keyset,
+            null,
+            4,
+        )};\n\n${exportT}\n`,
     );
 }
 
+/**
+ * Deletes file with keyset if it exists.
+ * @param fileName - I18n file
+ */
 function removeKeyset(fileName: string) {
     if (fs.existsSync(fileName)) {
         fs.unlinkSync(fileName);
     }
 }
 
+/**
+ * Adds import of i18n function from i18n file.
+ * @param baseFile
+ * @param importT
+ */
+function addI18nFileImportStatement(baseFile: string, importT: string) {
+    const content = fs.readFileSync(baseFile, 'utf8');
+
+    const importRegex =
+        /import\s*\{\s*i18n\s*\}\s*from\s*['"]\..*\.i18n\.js['"]\s*;/;
+    const requireRegex =
+        /const\s*{\s*i18n\s*}\s*=\s*require\s*\(['"]\..*\.i18n\.js['"]\)\s*;/;
+
+    if (!importRegex.test(content) && !requireRegex.test(content)) {
+        fs.writeFileSync(baseFile, importT + content);
+    }
+}
+
+/**
+ * Builds rule which generates i18n files.
+ * @param keyLanguage  Language which uses key
+ * @param langs        Available languages
+ * @param fileExt      I18n file extension
+ * @param importType   Type of import and exports
+ */
 export const createGenerateI18nFileRule = ({
     keyLanguage,
     langs,
     fileExt,
+    importType,
 }: Required<Config>): Rule.RuleModule => ({
     create(context) {
         const usedKeys: Set<string> = new Set();
+
+        const { importT, exportT, getImportFromI18nFileT } =
+            importExportTemplates[importType];
 
         return {
             'CallExpression'(node) {
@@ -44,7 +138,8 @@ export const createGenerateI18nFileRule = ({
                     node.callee?.name === 'i18n' &&
                     node.arguments.length >= 1 &&
                     node.arguments[0]?.type === 'Literal' &&
-                    typeof node.arguments[0].value === 'string'
+                    typeof node.arguments[0].value === 'string' &&
+                    !context.filename.includes('.i18n.')
                 ) {
                     usedKeys.add(node.arguments[0].value);
                 }
@@ -90,7 +185,17 @@ export const createGenerateI18nFileRule = ({
                 if (Object.keys(updatedKeyset).length === 0) {
                     removeKeyset(i18nFileName);
                 } else {
-                    saveKeyset(i18nFileName, updatedKeyset);
+                    saveKeyset({
+                        fileName: i18nFileName,
+                        keyset: updatedKeyset,
+                        importT,
+                        exportT,
+                    });
+
+                    addI18nFileImportStatement(
+                        context.filename,
+                        getImportFromI18nFileT(path.basename(i18nFileName)),
+                    );
                 }
             },
         };

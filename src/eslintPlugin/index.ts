@@ -2,7 +2,6 @@ import type { ESLint } from 'eslint';
 import { createGenerateI18nFileRule } from './rules/generateI18nFile';
 import type { Lang } from '../core/builder/types';
 
-// TODO: import type
 /** Plugin's config */
 export interface Config {
     /**
@@ -20,6 +19,11 @@ export interface Config {
      * @default js
      */
     fileExt?: 'js' | 'ts';
+    /**
+     * Import/export type for i18n files
+     * @default module
+     */
+    importType?: 'module' | 'commonjs';
 }
 
 /**
@@ -29,8 +33,9 @@ export const createEslintPlugin = ({
     keyLanguage = 'en',
     langs = ['en'],
     fileExt = 'js',
+    importType = 'module',
 }: Config = {}): ESLint.Plugin => ({
-    // TODO: will it work instead of `ignores` in index.test.eslint.config.js
+    // TODO: will it work instead of `ignores` in index.test.eslint.config.js?
     configs: {
         generateI18nFile: [
             {
@@ -43,6 +48,7 @@ export const createEslintPlugin = ({
             keyLanguage,
             langs,
             fileExt,
+            importType,
         }),
     },
 });

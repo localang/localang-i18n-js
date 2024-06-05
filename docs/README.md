@@ -30,7 +30,7 @@ Creates ESLint plugin to generate I18n files.
 
 #### Defined in
 
-eslintPlugin/index.ts:28
+[eslintPlugin/index.ts:32](https://github.com/localang/localang-i18n-js/blob/db15155/src/eslintPlugin/index.ts#L32)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 #### Defined in
 
-core/index.ts:34
+[core/index.ts:34](https://github.com/localang/localang-i18n-js/blob/db15155/src/core/index.ts#L34)
 
 ___
 
@@ -71,4 +71,4 @@ ___
 
 #### Defined in
 
-core/index.ts:27
+[core/index.ts:27](https://github.com/localang/localang-i18n-js/blob/db15155/src/core/index.ts#L27)
