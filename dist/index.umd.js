@@ -5,10 +5,10 @@
  */
 
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('fs'), require('path')) :
-    typeof define === 'function' && define.amd ? define(['exports', 'fs', 'path'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.localang = {}, global.fs, global.path));
-})(this, (function (exports, fs, path) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('fs'), require('path'), require('https')) :
+    typeof define === 'function' && define.amd ? define(['exports', 'fs', 'path', 'https'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.localang = {}, global.fs, global.path, global.https));
+})(this, (function (exports, fs, path, https) { 'use strict';
 
     /******************************************************************************
     Copyright (c) Microsoft Corporation.
@@ -90,6 +90,29 @@
     };
 
     /**
+     * Parses content from i18n file.
+     * @param base - Base string content.
+     * @returns - Keyset.
+     */
+    var parseContent = function (baseContent) {
+        // remove keyset initialization
+        var content = baseContent.replace(/const keyset = |;/g, '');
+        // remove import
+        content = content.substring(content.indexOf('\n') + 1);
+        // remove export
+        content = content.substring(0, content.lastIndexOf('\n'));
+        content = content.substring(0, content.lastIndexOf('\n'));
+        var parsed = {};
+        try {
+            parsed = JSON.parse(content);
+        }
+        catch (_) {
+            console.log('JSON parse error');
+        }
+        return parsed;
+    };
+
+    /**
      * Adds context wrapper to main function to store settings like app language.
      */
     var Api = /** @class */ (function () {
@@ -120,12 +143,16 @@
     };
 
     // TODO: comments
-    var moduleImportTemplate = 'import { makeI18n } from \'localang-i18n-js\';';
+    var moduleImportTemplate = "import { makeI18n } from 'localang-i18n-js';";
     var moduleExportTemplate = 'export const i18n = makeI18n(keyset);';
-    var commonJSImportTemplate = 'const { makeI18n } = require(\'localang-i18n-js\');';
+    var commonJSImportTemplate = "const { makeI18n } = require('localang-i18n-js');";
     var commonJSExportTemplate = 'module.exports = makeI18n(keyset);';
-    var getModuleImportFromI18nFileTemplate = function (i18nFileName) { return "import { i18n } from './".concat(i18nFileName, "';"); };
-    var getCommonJSImportFromI18nFileTemplate = function (i18nFileName) { return "const i18n = require('./".concat(i18nFileName, "');"); };
+    var getModuleImportFromI18nFileTemplate = function (i18nFileName) {
+        return "import { i18n } from './".concat(i18nFileName, "';\n");
+    };
+    var getCommonJSImportFromI18nFileTemplate = function (i18nFileName) {
+        return "const i18n = require('./".concat(i18nFileName, "');\n");
+    };
     var importExportTemplates = {
         module: {
             importT: moduleImportTemplate,
@@ -138,29 +165,43 @@
             getImportFromI18nFileT: getCommonJSImportFromI18nFileTemplate,
         },
     };
+    /**
+     * Trying to parse i18n file.
+     * @param fileName - Name of i18n file
+     * @returns Parsed keyset or empty object
+     */
     function loadKeyset(fileName) {
         if (fs.existsSync(fileName)) {
             var content = fs.readFileSync(fileName, 'utf8');
-            // remove keyset initialization
-            content = content.replace(/const keyset = |;/g, '');
-            // remove import
-            content = content.substring(content.indexOf('\n') + 1);
-            // remove export
-            content = content.substring(0, content.lastIndexOf('\n'));
-            content = content.substring(0, content.lastIndexOf('\n'));
-            return JSON.parse(content);
+            return parseContent(content);
         }
         return {};
     }
+    /**
+     * Saves keyset to i18n file.
+     * @param fileName - Name of i18n file
+     * @param keyset - Translations
+     * @param exportT - String with export of keyset
+     * @param importT - String with import of makeI18n function
+     */
     function saveKeyset(_a) {
         var fileName = _a.fileName, keyset = _a.keyset, exportT = _a.exportT, importT = _a.importT;
         fs.writeFileSync(fileName, "".concat(importT, "\n\nconst keyset = ").concat(JSON.stringify(keyset, null, 4), ";\n\n").concat(exportT, "\n"));
     }
+    /**
+     * Deletes file with keyset if it exists.
+     * @param fileName - I18n file
+     */
     function removeKeyset(fileName) {
         if (fs.existsSync(fileName)) {
             fs.unlinkSync(fileName);
         }
     }
+    /**
+     * Adds import of i18n function from i18n file.
+     * @param baseFile
+     * @param importT
+     */
     function addI18nFileImportStatement(baseFile, importT) {
         var content = fs.readFileSync(baseFile, 'utf8');
         var importRegex = /import\s*\{\s*i18n\s*\}\s*from\s*['"]\..*\.i18n\.js['"]\s*;/;
@@ -169,6 +210,13 @@
             fs.writeFileSync(baseFile, importT + content);
         }
     }
+    /**
+     * Builds rule which generates i18n files.
+     * @param keyLanguage  Language which uses key
+     * @param langs        Available languages
+     * @param fileExt      I18n file extension
+     * @param importType   Type of import and exports
+     */
     var createGenerateI18nFileRule = function (_a) {
         var keyLanguage = _a.keyLanguage, langs = _a.langs, fileExt = _a.fileExt, importType = _a.importType;
         return ({
@@ -182,10 +230,9 @@
                             ((_a = node.callee) === null || _a === void 0 ? void 0 : _a.name) === 'i18n' &&
                             node.arguments.length >= 1 &&
                             ((_b = node.arguments[0]) === null || _b === void 0 ? void 0 : _b.type) === 'Literal' &&
-                            typeof node.arguments[0].value === 'string') {
-                            if (!context.filename.includes('.i18n.')) {
-                                usedKeys.add(node.arguments[0].value);
-                            }
+                            typeof node.arguments[0].value === 'string' &&
+                            !context.filename.includes('.i18n.')) {
+                            usedKeys.add(node.arguments[0].value);
                         }
                     },
                     'Program:exit': function () {
@@ -199,6 +246,7 @@
                                 updatedKeyset[key] = {};
                                 langs.forEach(function (lang) {
                                     var translation = lang === keyLanguage ? key : '';
+                                    // @ts-expect-error -- TODO: TS2532: Object is possibly undefined
                                     updatedKeyset[key][lang] = isKeyPlural_1
                                         ? {
                                             zero: translation,
@@ -241,7 +289,7 @@
     var createEslintPlugin = function (_a) {
         var _b = _a === void 0 ? {} : _a, _c = _b.keyLanguage, keyLanguage = _c === void 0 ? 'en' : _c, _d = _b.langs, langs = _d === void 0 ? ['en'] : _d, _e = _b.fileExt, fileExt = _e === void 0 ? 'js' : _e, _f = _b.importType, importType = _f === void 0 ? 'module' : _f;
         return ({
-            // TODO: will it work instead of `ignores` in index.test.eslint.config.js
+            // TODO: will it work instead of `ignores` in index.test.eslint.config.js?
             configs: {
                 generateI18nFile: [
                     {
@@ -260,11 +308,133 @@
         });
     };
 
+    /**
+     * Updates content of local files.
+     * @param files - Files and keysets.
+     */
+    var sync = function (files) {
+        files.forEach(function (_a) {
+            var filePath = _a.filePath, keyset = _a.keyset;
+            if (!fs.existsSync(filePath)) {
+                console.log("File ".concat(filePath, " doesn't exist"));
+                return;
+            }
+            fs.readFile(filePath, 'utf8', function (err, data) {
+                if (err) {
+                    throw new Error("Error reading file ".concat(filePath, ": ").concat(err.message));
+                }
+                var newObjectString = JSON.stringify(keyset, null, 4).replace(/"(\w+)":/g, '$1:');
+                var regex = /const keyset = {[\s\S]*?};/;
+                var updatedCodeString = data.replace(regex, "const keyset = ".concat(newObjectString, ";"));
+                fs.writeFileSync(filePath, updatedCodeString);
+            });
+        });
+    };
+    /**
+     * Loads translations from localang.xyz and updates local files.
+     * @param authToken - Authorization token with translations:get permission on localang.xyz.
+     */
+    var pull = function (authToken) {
+        var req = https.request({
+            hostname: 'https://localang.xyz',
+            port: 443,
+            path: '/api/translations/getAll',
+            method: 'GET',
+            headers: {
+                'Authorization': "Bearer ".concat(authToken),
+                'Content-Type': 'application/json',
+            },
+        }, function (res) {
+            var data = '';
+            res.on('data', function (chunk) {
+                data += chunk;
+            });
+            res.on('end', function () {
+                var result = JSON.parse(data);
+                if ((result === null || result === void 0 ? void 0 : result.status) !== 'success') {
+                    throw new Error('Error getting keysets');
+                }
+                sync(result.files);
+            });
+        });
+        req.on('error', function (e) {
+            throw new Error("Error syncing keysets: ".concat(e.message));
+        });
+        req.end();
+    };
+
+    /**
+     * Uploads local translations to localang.xyz.
+     * @param authToken - Authorization token with translations:update permission on localang.xyz.
+     * @param files - I18n files from which translations should be used.
+     */
+    var push = function (authToken, files) {
+        var requestData = {};
+        files.forEach(function (file) {
+            var filePath = path.resolve(process.cwd(), file);
+            var baseFile = filePath.replace(/\.i18n\./, '.');
+            if (fs.existsSync(filePath)) {
+                fs.readFile(filePath, 'utf8', function (err, data) {
+                    if (err) {
+                        throw new Error("Error reading file ".concat(file, ": ").concat(err.message));
+                    }
+                    try {
+                        var content = parseContent(data);
+                        requestData[baseFile] = {
+                            operation: 'update',
+                            translations: content,
+                        };
+                    }
+                    catch (parseError) {
+                        throw new Error("Error parsing JSON in file ".concat(file, ": ").concat(typeof parseError === 'object' &&
+                            parseError !== null &&
+                            'message' in parseError
+                            ? parseError.message
+                            : ''));
+                    }
+                });
+            }
+            else {
+                requestData[baseFile] = {
+                    operation: 'delete',
+                };
+            }
+        });
+        var req = https.request({
+            hostname: 'https://localang.xyz',
+            port: 443,
+            path: '/api/translations/update',
+            method: 'POST',
+            headers: {
+                'Authorization': "Bearer ".concat(authToken),
+                'Content-Type': 'application/json',
+            },
+        }, function (res) {
+            var data = '';
+            res.on('data', function (chunk) {
+                data += chunk;
+            });
+            res.on('end', function () {
+                var result = JSON.parse(data);
+                if ((result === null || result === void 0 ? void 0 : result.status) !== 'success') {
+                    throw new Error('Error syncing keysets');
+                }
+            });
+        });
+        req.write(requestData);
+        req.on('error', function (e) {
+            throw new Error("Error syncing keysets: ".concat(e.message));
+        });
+        req.end();
+    };
+
     var _a;
     var makeI18n = (_a = new Api(), _a.makeI18n), setSettings = _a.setSettings;
 
     exports.createEslintPlugin = createEslintPlugin;
     exports.makeI18n = makeI18n;
+    exports.pull = pull;
+    exports.push = push;
     exports.setSettings = setSettings;
 
 }));

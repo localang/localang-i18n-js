@@ -1,4 +1,5 @@
 import type { Keyset, Lang } from './builder/types';
+export { parseContent } from './helpers/parseContent';
 type Settings = {
     /**
      * Project language
@@ -15,5 +16,4 @@ export declare class Api {
     setSettings(settings: Partial<Settings>): void;
     makeI18n(keyset: Keyset, placeholders?: Record<string, string | number>): (key: string) => string;
 }
-export {};
 //# sourceMappingURL=index.d.ts.map

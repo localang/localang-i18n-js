@@ -2,4 +2,5 @@ export declare const makeI18n: (keyset: import("./core/builder/types").Keyset, p
     lang: import("./core/builder/types").Lang;
 }>) => void;
 export { createEslintPlugin } from './eslintPlugin';
+export { pull, push } from './synchronizer';
 //# sourceMappingURL=index.d.ts.map

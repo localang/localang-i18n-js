@@ -3,6 +3,7 @@ import fs from 'fs';
 import type { Config } from '../index';
 import { isPlural } from '../../helpers/string/isPlural';
 import path from 'path';
+import { parseContent } from '../../core';
 
 // TODO: comments
 
@@ -38,19 +39,9 @@ const importExportTemplates = {
  */
 function loadKeyset(fileName: string) {
     if (fs.existsSync(fileName)) {
-        let content = fs.readFileSync(fileName, 'utf8');
+        const content = fs.readFileSync(fileName, 'utf8');
 
-        // remove keyset initialization
-        content = content.replace(/const keyset = |;/g, '');
-
-        // remove import
-        content = content.substring(content.indexOf('\n') + 1);
-
-        // remove export
-        content = content.substring(0, content.lastIndexOf('\n'));
-        content = content.substring(0, content.lastIndexOf('\n'));
-
-        return JSON.parse(content);
+        return parseContent(content);
     }
 
     return {};
@@ -162,6 +153,7 @@ export const createGenerateI18nFileRule = ({
                         langs.forEach((lang) => {
                             const translation = lang === keyLanguage ? key : '';
 
+                            // @ts-expect-error -- TODO: TS2532: Object is possibly undefined
                             updatedKeyset[key][lang] = isKeyPlural
                                 ? {
                                       zero: translation,

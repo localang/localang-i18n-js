@@ -2,6 +2,7 @@ import type { Lang } from '../core/builder/types';
 import fs from 'fs';
 import path from 'path';
 import { ESLint } from 'eslint';
+import { parseContent } from '../core';
 
 const tempDir = path.join(__dirname, 'temp');
 export const langs: Lang[] = ['en', 'es', 'fr'];
@@ -25,21 +26,9 @@ function readKeyset(fileName: string) {
     const filePath = path.join(tempDir, fileName);
 
     if (fs.existsSync(filePath)) {
-        let content = fs.readFileSync(filePath, 'utf8');
+        const content = fs.readFileSync(filePath, 'utf8');
 
-        // remove keyset initialization
-        content = content.replace(/const keyset = |;/g, '');
-
-        // remove import
-        content = content.substring(content.indexOf('\n') + 1);
-
-        // remove export
-        content = content.substring(0, content.lastIndexOf('\n'));
-        content = content.substring(0, content.lastIndexOf('\n'));
-
-        console.log(content);
-
-        return JSON.parse(content);
+        return parseContent(content);
     }
 
     return null;

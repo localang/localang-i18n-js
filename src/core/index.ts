@@ -1,6 +1,8 @@
 import type { Keyset, Lang } from './builder/types';
 import { makeI18n } from './builder/makeI18n';
 
+export { parseContent } from './helpers/parseContent';
+
 type Settings = {
     /**
      * Project language
