@@ -62,7 +62,7 @@ describe('synchronizer/push', () => {
             },
         );
 
-        push(authToken, files);
+        push(authToken, 1, files);
 
         process.nextTick(() => {
             expect(https.request).toHaveBeenCalledWith(
@@ -84,12 +84,15 @@ describe('synchronizer/push', () => {
                 expect.any(Function),
             );
             expect(request.write).toHaveBeenCalledWith({
-                [baseFile1]: {
-                    operation: 'update',
-                    translations: { key: 'value' },
-                },
-                [baseFile2]: {
-                    operation: 'delete',
+                project_id: 1,
+                files: {
+                    [baseFile1]: {
+                        operation: 'update',
+                        translations: { key: 'value' },
+                    },
+                    [baseFile2]: {
+                        operation: 'delete',
+                    },
                 },
             });
             expect(request.end).toHaveBeenCalled();
@@ -141,7 +144,7 @@ describe('synchronizer/push', () => {
             },
         );
 
-        push(authToken, files);
+        push(authToken, 1, files);
 
         process.nextTick(() => {
             expect(https.request).toHaveBeenCalledWith(
@@ -163,8 +166,11 @@ describe('synchronizer/push', () => {
                 expect.any(Function),
             );
             expect(request.write).toHaveBeenCalledWith({
-                [baseFile1]: { operation: 'delete' },
-                [baseFile2]: { operation: 'delete' },
+                project_id: 1,
+                files: {
+                    [baseFile1]: { operation: 'delete' },
+                    [baseFile2]: { operation: 'delete' },
+                },
             });
             expect(request.end).toHaveBeenCalled();
 

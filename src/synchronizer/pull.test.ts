@@ -62,14 +62,14 @@ describe('synchronizer/pull', () => {
             },
         );
 
-        pull(authToken);
+        pull(authToken, 1);
 
         process.nextTick(() => {
             expect(https.request).toHaveBeenCalledWith(
                 {
                     hostname: 'https://localang.xyz',
                     port: 443,
-                    path: '/api/translations/getAll',
+                    path: '/api/translations/getAll?project_id=1',
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
@@ -110,28 +110,30 @@ describe('synchronizer/pull', () => {
             end: jest.fn(),
         };
 
-        (https.request as jest.Mock).mockImplementation((_options, callback) => {
-            const res = {
-                on: jest.fn((event, handler) => {
-                    if (event === 'data') {
-                        handler(
-                            JSON.stringify({
-                                status: 'success',
-                                files: exampleFiles,
-                            }),
-                        );
-                    }
-                    if (event === 'end') {
-                        handler();
-                    }
-                }),
-            };
+        (https.request as jest.Mock).mockImplementation(
+            (_options, callback) => {
+                const res = {
+                    on: jest.fn((event, handler) => {
+                        if (event === 'data') {
+                            handler(
+                                JSON.stringify({
+                                    status: 'success',
+                                    files: exampleFiles,
+                                }),
+                            );
+                        }
+                        if (event === 'end') {
+                            handler();
+                        }
+                    }),
+                };
 
-            callback(res);
-            return request;
-        });
+                callback(res);
+                return request;
+            },
+        );
 
-        pull(authToken);
+        pull(authToken, 1);
 
         process.nextTick(() => {
             expect(fs.existsSync).toHaveBeenCalledWith(exampleFilePath);
@@ -154,29 +156,31 @@ describe('synchronizer/pull', () => {
             end: jest.fn(),
         };
 
-        (https.request as jest.Mock).mockImplementation((_options, callback) => {
-            const res = {
-                on: jest.fn((event, handler) => {
-                    if (event === 'data') {
-                        handler(
-                            JSON.stringify({
-                                status: 'success',
-                                files: exampleFiles,
-                            }),
-                        );
-                    }
-                    if (event === 'end') {
-                        handler();
-                    }
-                }),
-            };
+        (https.request as jest.Mock).mockImplementation(
+            (_options, callback) => {
+                const res = {
+                    on: jest.fn((event, handler) => {
+                        if (event === 'data') {
+                            handler(
+                                JSON.stringify({
+                                    status: 'success',
+                                    files: exampleFiles,
+                                }),
+                            );
+                        }
+                        if (event === 'end') {
+                            handler();
+                        }
+                    }),
+                };
 
-            callback(res);
-            return request;
-        });
+                callback(res);
+                return request;
+            },
+        );
 
         expect(() => {
-            pull(authToken);
+            pull(authToken, 1);
         }).toThrowError(
             'Error reading file path/to/example.i18n.js: Read error',
         );
@@ -204,7 +208,7 @@ describe('synchronizer/pull', () => {
         (https.request as jest.Mock).mockImplementation(() => request);
 
         expect(() => {
-            pull(authToken);
+            pull(authToken, 1);
         }).toThrowError('Error syncing keysets: Request error');
 
         process.nextTick(() => {

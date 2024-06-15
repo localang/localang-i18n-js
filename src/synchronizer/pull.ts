@@ -37,14 +37,15 @@ const sync = (files: Array<{ filePath: string; keyset: Keyset }>) => {
 
 /**
  * Loads translations from localang.xyz and updates local files.
- * @param authToken - Authorization token with translations:get permission on localang.xyz.
+ * @param authToken - Authorization token with translations:read permission on localang.xyz.
+ * @param projectId - ID of project on localang.xyz.
  */
-export const pull = (authToken: string) => {
+export const pull = (authToken: string, projectId: number) => {
     const req = https.request(
         {
             hostname: 'https://localang.xyz',
             port: 443,
-            path: '/api/translations/getAll',
+            path: `/api/translations/getAll?project_id=${projectId}`,
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${authToken}`,

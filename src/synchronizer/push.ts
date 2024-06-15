@@ -7,9 +7,10 @@ import type { Keyset } from '../core/builder/types';
 /**
  * Uploads local translations to localang.xyz.
  * @param authToken - Authorization token with translations:update permission on localang.xyz.
+ * @param projectId - ID of project on localang.xyz.
  * @param files - I18n files from which translations should be used.
  */
-export const push = (authToken: string, files: string[]) => {
+export const push = (authToken: string, projectId: number, files: string[]) => {
     const requestData: Record<
         string,
         {
@@ -84,7 +85,10 @@ export const push = (authToken: string, files: string[]) => {
         },
     );
 
-    req.write(requestData);
+    req.write({
+        project_id: projectId,
+        files: requestData,
+    });
 
     req.on('error', function (e) {
         throw new Error(`Error syncing keysets: ${e.message}`);

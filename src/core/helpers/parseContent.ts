@@ -20,8 +20,8 @@ export const parseContent = (baseContent: string): Keyset => {
 
     try {
         parsed = JSON.parse(content);
-    } catch (_) {
-        console.log('JSON parse error');
+    } catch (error) {
+        console.log(`JSON parse error: ${error}`);
     }
 
     return parsed;
