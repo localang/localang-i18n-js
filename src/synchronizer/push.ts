@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import https from 'https';
-import { parseContent } from '../core';
+import { importKeyset } from '../core';
 import type { Keyset } from '../core/builder/types';
 
 /**
@@ -19,37 +19,29 @@ export const push = (authToken: string, projectId: number, files: string[]) => {
         }
     > = {};
 
-    files.forEach((file) => {
+    files.forEach(async (file) => {
         const filePath = path.resolve(process.cwd(), file);
         const baseFile = filePath.replace(/\.i18n\./, '.');
 
         if (fs.existsSync(filePath)) {
-            fs.readFile(filePath, 'utf8', (err, data) => {
-                if (err) {
-                    throw new Error(
-                        `Error reading file ${file}: ${err.message}`,
-                    );
-                }
+            try {
+                const content = await importKeyset(filePath);
 
-                try {
-                    const content = parseContent(data);
-
-                    requestData[baseFile] = {
-                        operation: 'update',
-                        translations: content,
-                    };
-                } catch (parseError: unknown) {
-                    throw new Error(
-                        `Error parsing JSON in file ${file}: ${
-                            typeof parseError === 'object' &&
-                            parseError !== null &&
-                            'message' in parseError
-                                ? parseError.message
-                                : ''
-                        }`,
-                    );
-                }
-            });
+                requestData[baseFile] = {
+                    operation: 'update',
+                    translations: content,
+                };
+            } catch (parseError: unknown) {
+                throw new Error(
+                    `Error parsing JSON in file ${file}: ${
+                        typeof parseError === 'object' &&
+                        parseError !== null &&
+                        'message' in parseError
+                            ? parseError.message
+                            : ''
+                    }`,
+                );
+            }
         } else {
             requestData[baseFile] = {
                 operation: 'delete',

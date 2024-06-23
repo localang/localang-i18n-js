@@ -2,7 +2,7 @@ import type { Keyset } from '../builder/types';
 
 /**
  * Parses content from i18n file.
- * @param base - Base string content.
+ * @param baseContent - Base string content.
  * @returns - Keyset.
  */
 export const parseContent = (baseContent: string): Keyset => {
@@ -13,6 +13,7 @@ export const parseContent = (baseContent: string): Keyset => {
     content = content.substring(content.indexOf('\n') + 1);
 
     // remove export
+    content = content.substring(0, content.lastIndexOf('\n'));
     content = content.substring(0, content.lastIndexOf('\n'));
     content = content.substring(0, content.lastIndexOf('\n'));
 

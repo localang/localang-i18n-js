@@ -1,4 +1,4 @@
-import { parseContent } from './parseContent';
+import { importKeyset } from './importKeyset';
 
 const keyset = {
     'What is love?': {
@@ -25,20 +25,16 @@ const keyset = {
     },
 };
 
-const content = `import { makeI18n } from 'localang-js-lib';
-
-const keyset = ${JSON.stringify(keyset, null, 4)};
-
-export i18n = makeI18n(keyset);
-export { keyset };
-`;
-
-describe('core/helpers/parseContent', () => {
-    it('should return keyset', () => {
-        expect(parseContent(content)).toEqual(keyset);
+describe('core/helpers/importKeyset', () => {
+    it('should return keyset from module files', async () => {
+        expect(
+            await importKeyset('./importKeyset.test.moduleExample.ts'),
+        ).toEqual(keyset);
     });
 
-    it('should return empty object when parsing is failed', () => {
-        expect(parseContent('qwerty')).toEqual({});
+    it('should return keyset from commonjs files', async () => {
+        expect(
+            await importKeyset('./importKeyset.test.commonExample.ts'),
+        ).toEqual(keyset);
     });
 });

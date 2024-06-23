@@ -1,5 +1,3 @@
-import { parseContent } from './parseContent';
-
 const keyset = {
     'What is love?': {
         ar: 'What is love?',
@@ -25,20 +23,4 @@ const keyset = {
     },
 };
 
-const content = `import { makeI18n } from 'localang-js-lib';
-
-const keyset = ${JSON.stringify(keyset, null, 4)};
-
-export i18n = makeI18n(keyset);
 export { keyset };
-`;
-
-describe('core/helpers/parseContent', () => {
-    it('should return keyset', () => {
-        expect(parseContent(content)).toEqual(keyset);
-    });
-
-    it('should return empty object when parsing is failed', () => {
-        expect(parseContent('qwerty')).toEqual({});
-    });
-});

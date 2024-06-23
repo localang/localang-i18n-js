@@ -1,6 +1,7 @@
 import type { Keyset, Lang } from './builder/types';
 import { makeI18n } from './builder/makeI18n';
 
+export { importKeyset } from './helpers/importKeyset';
 export { parseContent } from './helpers/parseContent';
 
 type Settings = {

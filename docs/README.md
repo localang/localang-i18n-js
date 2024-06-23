@@ -32,7 +32,7 @@ Creates ESLint plugin to generate I18n files.
 
 #### Defined in
 
-[eslintPlugin/index.ts:32](https://github.com/localang/localang-i18n-js/blob/ea32932/src/eslintPlugin/index.ts#L32)
+[eslintPlugin/index.ts:32](https://github.com/localang/localang-i18n-js/blob/8f9ecd7/src/eslintPlugin/index.ts#L32)
 
 ___
 
@@ -53,13 +53,13 @@ ___
 
 #### Defined in
 
-[core/index.ts:36](https://github.com/localang/localang-i18n-js/blob/ea32932/src/core/index.ts#L36)
+[core/index.ts:37](https://github.com/localang/localang-i18n-js/blob/8f9ecd7/src/core/index.ts#L37)
 
 ___
 
 ### pull
 
-▸ **pull**(`authToken`): `void`
+▸ **pull**(`authToken`, `projectId`): `void`
 
 Loads translations from localang.xyz and updates local files.
 
@@ -67,7 +67,8 @@ Loads translations from localang.xyz and updates local files.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `authToken` | `string` | Authorization token with translations:get permission on localang.xyz. |
+| `authToken` | `string` | Authorization token with translations:read permission on localang.xyz. |
+| `projectId` | `number` | ID of project on localang.xyz. |
 
 #### Returns
 
@@ -75,13 +76,13 @@ Loads translations from localang.xyz and updates local files.
 
 #### Defined in
 
-[synchronizer/pull.ts:42](https://github.com/localang/localang-i18n-js/blob/ea32932/src/synchronizer/pull.ts#L42)
+[synchronizer/pull.ts:43](https://github.com/localang/localang-i18n-js/blob/8f9ecd7/src/synchronizer/pull.ts#L43)
 
 ___
 
 ### push
 
-▸ **push**(`authToken`, `files`): `void`
+▸ **push**(`authToken`, `projectId`, `files`): `void`
 
 Uploads local translations to localang.xyz.
 
@@ -90,6 +91,7 @@ Uploads local translations to localang.xyz.
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `authToken` | `string` | Authorization token with translations:update permission on localang.xyz. |
+| `projectId` | `number` | ID of project on localang.xyz. |
 | `files` | `string`[] | I18n files from which translations should be used. |
 
 #### Returns
@@ -98,7 +100,7 @@ Uploads local translations to localang.xyz.
 
 #### Defined in
 
-[synchronizer/push.ts:12](https://github.com/localang/localang-i18n-js/blob/ea32932/src/synchronizer/push.ts#L12)
+[synchronizer/push.ts:13](https://github.com/localang/localang-i18n-js/blob/8f9ecd7/src/synchronizer/push.ts#L13)
 
 ___
 
@@ -118,4 +120,4 @@ ___
 
 #### Defined in
 
-[core/index.ts:29](https://github.com/localang/localang-i18n-js/blob/ea32932/src/core/index.ts#L29)
+[core/index.ts:30](https://github.com/localang/localang-i18n-js/blob/8f9ecd7/src/core/index.ts#L30)

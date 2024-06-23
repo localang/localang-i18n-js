@@ -2,12 +2,12 @@ import path from 'path';
 import fs from 'fs';
 import https from 'https';
 import { push } from './push';
-import { parseContent } from '../core';
+import { importKeyset } from '../core';
 
 jest.mock('fs');
 jest.mock('https');
 jest.mock('../core', () => ({
-    parseContent: jest.fn(),
+    importKeyset: jest.fn(),
 }));
 
 describe('synchronizer/push', () => {
@@ -26,17 +26,10 @@ describe('synchronizer/push', () => {
         (fs.existsSync as jest.Mock).mockImplementation(
             (filePath) => filePath === resolvedFile1Path,
         );
-        (fs.readFile as unknown as jest.Mock).mockImplementation(
-            (filePath, _encoding, callback) => {
-                if (filePath === resolvedFile1Path) {
-                    callback(null, '{"key": "value"}');
-                }
-            },
-        );
 
-        (parseContent as jest.Mock).mockImplementation((data) =>
-            JSON.parse(data),
-        );
+        (importKeyset as jest.Mock).mockImplementation(() => ({
+            key: 'value',
+        }));
 
         const request = {
             on: jest.fn(),
@@ -97,21 +90,10 @@ describe('synchronizer/push', () => {
             });
             expect(request.end).toHaveBeenCalled();
 
-            expect(parseContent).toHaveBeenCalledWith('{"key": "value"}');
+            expect(importKeyset).toHaveBeenCalledWith(resolvedFile1Path);
 
             expect(fs.existsSync).toHaveBeenCalledWith(resolvedFile1Path);
             expect(fs.existsSync).toHaveBeenCalledWith(resolvedFile2Path);
-
-            expect(fs.readFile).toHaveBeenCalledWith(
-                resolvedFile1Path,
-                'utf8',
-                expect.any(Function),
-            );
-            expect(fs.readFile).not.toHaveBeenCalledWith(
-                resolvedFile2Path,
-                'utf8',
-                expect.any(Function),
-            );
 
             done();
         });
@@ -174,12 +156,10 @@ describe('synchronizer/push', () => {
             });
             expect(request.end).toHaveBeenCalled();
 
-            expect(parseContent).not.toHaveBeenCalled();
+            expect(importKeyset).not.toHaveBeenCalled();
 
             expect(fs.existsSync).toHaveBeenCalledWith(resolvedFile1Path);
             expect(fs.existsSync).toHaveBeenCalledWith(resolvedFile2Path);
-
-            expect(fs.readFile).not.toHaveBeenCalled();
 
             done();
         });
