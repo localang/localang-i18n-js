@@ -5,8 +5,6 @@ import { isPlural } from '../../helpers/string/isPlural';
 import path from 'path';
 import { parseContent } from '../../core';
 
-// TODO: comments
-
 const moduleImportTemplate = "import { makeI18n } from 'localang-i18n-js';";
 const moduleExportTemplate = 'export const i18n = makeI18n(keyset);';
 

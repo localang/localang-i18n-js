@@ -210,7 +210,6 @@
         return /\bcount\d*\b/.test(text);
     };
 
-    // TODO: comments
     var moduleImportTemplate = "import { makeI18n } from 'localang-i18n-js';";
     var moduleExportTemplate = 'export const i18n = makeI18n(keyset);';
     var commonJSImportTemplate = "const { makeI18n } = require('localang-i18n-js');";
