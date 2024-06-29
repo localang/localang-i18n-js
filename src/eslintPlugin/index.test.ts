@@ -81,9 +81,7 @@ describe('eslintPlugin/index', () => {
             fr: '',
         });
 
-        expect(updatedContent).toContain(
-            `import { i18n } from './test.i18n.js';`,
-        );
+        expect(updatedContent).toContain(`import { i18n } from './test.i18n';`);
     });
 
     it('should delete .i18n.js file then there is no keys left', async () => {

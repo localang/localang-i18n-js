@@ -1,5 +1,5 @@
 {
-    "name": "localang-js-lib",
+    "name": "localang-i18n-js",
     "version": "0.0.1",
     "description": "",
     "scripts": {
@@ -73,5 +73,8 @@
     "bugs": {
         "url": "https://github.com/localang/localang-i18n-js/issues"
     },
-    "homepage": "https://github.com/localang/localang-i18n-js#readme"
+    "homepage": "https://github.com/localang/localang-i18n-js#readme",
+    "dependencies": {
+        "rollup-plugin-copy": "^3.5.0"
+    }
 }

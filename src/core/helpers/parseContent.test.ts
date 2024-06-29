@@ -25,7 +25,7 @@ const keyset = {
     },
 };
 
-const content = `import { makeI18n } from 'localang-js-lib';
+const content = `import { makeI18n } from 'localang-i18n-js';
 
 const keyset = ${JSON.stringify(keyset, null, 4)};
 

@@ -34,7 +34,7 @@ export class Api {
         };
     }
 
-    makeI18n(keyset: Keyset, placeholders?: Record<string, string | number>) {
-        return makeI18n(this.settings.lang, keyset, placeholders);
+    makeI18n(keyset: Keyset) {
+        return makeI18n(this.settings.lang, keyset);
     }
 }

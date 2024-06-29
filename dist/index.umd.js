@@ -1,5 +1,5 @@
 /*!
- * localang-js-lib v0.0.1
+ * localang-i18n-js v0.0.1
  * (c) Localang
  * Released under the MIT License.
  */
@@ -98,11 +98,10 @@
      * Creates function to work with translations.
      * @param lang - Current app language
      * @param keyset - Translations keyset
-     * @param placeholders - Placeholders and its values
      * @returns - Function to work with translations.
      */
-    var makeI18n$1 = function (lang, keyset, placeholders) {
-        return function (key) {
+    var makeI18n$1 = function (lang, keyset) {
+        return function (key, placeholders) {
             var translations = keyset[key];
             if (!translations) {
                 return '';
@@ -194,8 +193,8 @@
         Api.prototype.setSettings = function (settings) {
             this.settings = __assign(__assign({}, this.settings), settings);
         };
-        Api.prototype.makeI18n = function (keyset, placeholders) {
-            return makeI18n$1(this.settings.lang, keyset, placeholders);
+        Api.prototype.makeI18n = function (keyset) {
+            return makeI18n$1(this.settings.lang, keyset);
         };
         return Api;
     }());
@@ -266,23 +265,22 @@
     }
     /**
      * Adds import of i18n function from i18n file.
-     * @param baseFile
-     * @param importT
+     * @param baseFile - File which imports i18n
+     * @param baseI18nFileNameWithoutExt - Name of i18n file without extension
+     * @param importT - Import string
      */
-    function addI18nFileImportStatement(baseFile, importT) {
+    function addI18nFileImportStatement(baseFile, baseI18nFileNameWithoutExt, importT) {
         var content = fs.readFileSync(baseFile, 'utf8');
-        var importRegex = /import\s*\{\s*i18n\s*\}\s*from\s*['"]\..*\.i18n\.js['"]\s*;/;
-        var requireRegex = /const\s*{\s*i18n\s*}\s*=\s*require\s*\(['"]\..*\.i18n\.js['"]\)\s*;/;
-        if (!importRegex.test(content) && !requireRegex.test(content)) {
+        if (!content.includes(baseI18nFileNameWithoutExt)) {
             fs.writeFileSync(baseFile, importT + content);
         }
     }
     /**
      * Builds rule which generates i18n files.
-     * @param keyLanguage  Language which uses key
-     * @param langs        Available languages
-     * @param fileExt      I18n file extension
-     * @param importType   Type of import and exports
+     * @param keyLanguage - Language which uses key
+     * @param langs - Available languages
+     * @param fileExt - I18n file extension
+     * @param importType - Type of import and exports
      */
     var createGenerateI18nFileRule = function (_a) {
         var keyLanguage = _a.keyLanguage, langs = _a.langs, fileExt = _a.fileExt, importType = _a.importType;
@@ -304,6 +302,9 @@
                     },
                     'Program:exit': function () {
                         var fileName = context.filename.substring(0, context.filename.lastIndexOf('.'));
+                        var baseName = path.basename(context.filename);
+                        var baseFileName = baseName.substring(0, baseName.lastIndexOf('.'));
+                        var baseI18nFileNameWithoutExt = "".concat(baseFileName, ".i18n");
                         var i18nFileName = "".concat(fileName, ".i18n.").concat(fileExt);
                         var existingKeyset = loadKeyset(i18nFileName);
                         var updatedKeyset = __assign({}, existingKeyset);
@@ -342,7 +343,7 @@
                                 importT: importT,
                                 exportT: exportT,
                             });
-                            addI18nFileImportStatement(context.filename, getImportFromI18nFileT(path.basename(i18nFileName)));
+                            addI18nFileImportStatement(context.filename, baseI18nFileNameWithoutExt, getImportFromI18nFileT(baseI18nFileNameWithoutExt));
                         }
                     },
                 };
@@ -356,14 +357,6 @@
     var createEslintPlugin = function (_a) {
         var _b = _a === void 0 ? {} : _a, _c = _b.keyLanguage, keyLanguage = _c === void 0 ? 'en' : _c, _d = _b.langs, langs = _d === void 0 ? ['en'] : _d, _e = _b.fileExt, fileExt = _e === void 0 ? 'js' : _e, _f = _b.importType, importType = _f === void 0 ? 'module' : _f;
         return ({
-            // TODO: will it work instead of `ignores` in index.test.eslint.config.js?
-            configs: {
-                generateI18nFile: [
-                    {
-                        ignores: ['**/*.i18n.*'],
-                    },
-                ],
-            },
             rules: {
                 'generate-i18n-file': createGenerateI18nFileRule({
                     keyLanguage: keyLanguage,

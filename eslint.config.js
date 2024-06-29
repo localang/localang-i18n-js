@@ -29,7 +29,6 @@ const config = [
     }),
     {
         ignores: [
-            '**/*.i18n.*',
             'docs',
             'dist',
             'types',

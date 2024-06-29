@@ -37,38 +37,40 @@ describe('core/builder/makeI18n', () => {
     });
 
     it('should return correct plural form for count = 0', () => {
-        const i18n = makeI18n('ar', keyset, { count: 0 });
-        expect(i18n('{count} left')).toBe('Nothing left');
+        const i18n = makeI18n('ar', keyset);
+        expect(i18n('{count} left', { count: 0 })).toBe('Nothing left');
     });
 
     it('should return correct plural form for count = 1', () => {
-        const i18n = makeI18n('ar', keyset, { count: 1 });
-        expect(i18n('{count} left')).toBe('One left');
+        const i18n = makeI18n('ar', keyset);
+        expect(i18n('{count} left', { count: 1 })).toBe('One left');
     });
 
     it('should return correct plural form for count = 2', () => {
-        const i18n = makeI18n('ar', keyset, { count: 2 });
-        expect(i18n('{count} left')).toBe('Two left');
+        const i18n = makeI18n('ar', keyset);
+        expect(i18n('{count} left', { count: 2 })).toBe('Two left');
     });
 
     it('should return correct plural form for count = 3', () => {
-        const i18n = makeI18n('ar', keyset, { count: 3 });
-        expect(i18n('{count} left')).toBe('A few left');
+        const i18n = makeI18n('ar', keyset);
+        expect(i18n('{count} left', { count: 3 })).toBe('A few left');
     });
 
     it('should return correct plural form for count = 5', () => {
-        const i18n = makeI18n('ar', keyset, { count: 5 });
-        expect(i18n('{count} left')).toBe('A few left');
+        const i18n = makeI18n('ar', keyset);
+        expect(i18n('{count} left', { count: 5 })).toBe('A few left');
     });
 
     it('should return correct plural form for count = 10', () => {
-        const i18n = makeI18n('ar', keyset, { count: 10 });
-        expect(i18n('{count} left')).toBe('A few left');
+        const i18n = makeI18n('ar', keyset);
+        expect(i18n('{count} left', { count: 10 })).toBe('A few left');
     });
 
     it('should replace placeholders correctly', () => {
-        const i18n = makeI18n('ar', keyset, { count: 10, name: 'John' });
-        expect(i18n('{count} left')).toBe('A few left');
+        const i18n = makeI18n('ar', keyset);
+        expect(i18n('{count} left', { count: 10, name: 'John' })).toBe(
+            'A few left',
+        );
     });
 
     it('should handle missing placeholders gracefully', () => {

@@ -32,20 +32,19 @@ Creates ESLint plugin to generate I18n files.
 
 #### Defined in
 
-[eslintPlugin/index.ts:32](https://github.com/localang/localang-i18n-js/blob/8aeeff7/src/eslintPlugin/index.ts#L32)
+[eslintPlugin/index.ts:32](https://github.com/localang/localang-i18n-js/blob/dec5b11/src/eslintPlugin/index.ts#L32)
 
 ___
 
 ### makeI18n
 
-▸ **makeI18n**(`keyset`, `placeholders?`): `MakeI18nResponse`
+▸ **makeI18n**(`keyset`): `MakeI18nResponse`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `keyset` | `Keyset` |
-| `placeholders?` | `Record`<`string`, `string` \| `number`\> |
 
 #### Returns
 
@@ -53,7 +52,7 @@ ___
 
 #### Defined in
 
-[core/index.ts:37](https://github.com/localang/localang-i18n-js/blob/8aeeff7/src/core/index.ts#L37)
+[core/index.ts:37](https://github.com/localang/localang-i18n-js/blob/dec5b11/src/core/index.ts#L37)
 
 ___
 
@@ -76,7 +75,7 @@ Loads translations from localang.xyz and updates local files.
 
 #### Defined in
 
-[synchronizer/pull.ts:43](https://github.com/localang/localang-i18n-js/blob/8aeeff7/src/synchronizer/pull.ts#L43)
+[synchronizer/pull.ts:43](https://github.com/localang/localang-i18n-js/blob/dec5b11/src/synchronizer/pull.ts#L43)
 
 ___
 
@@ -100,7 +99,7 @@ Uploads local translations to localang.xyz.
 
 #### Defined in
 
-[synchronizer/push.ts:13](https://github.com/localang/localang-i18n-js/blob/8aeeff7/src/synchronizer/push.ts#L13)
+[synchronizer/push.ts:13](https://github.com/localang/localang-i18n-js/blob/dec5b11/src/synchronizer/push.ts#L13)
 
 ___
 
@@ -120,4 +119,4 @@ ___
 
 #### Defined in
 
-[core/index.ts:30](https://github.com/localang/localang-i18n-js/blob/8aeeff7/src/core/index.ts#L30)
+[core/index.ts:30](https://github.com/localang/localang-i18n-js/blob/dec5b11/src/core/index.ts#L30)

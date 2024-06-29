@@ -85,28 +85,28 @@ function removeKeyset(fileName: string) {
 
 /**
  * Adds import of i18n function from i18n file.
- * @param baseFile
- * @param importT
+ * @param baseFile - File which imports i18n
+ * @param baseI18nFileNameWithoutExt - Name of i18n file without extension
+ * @param importT - Import string
  */
-function addI18nFileImportStatement(baseFile: string, importT: string) {
+function addI18nFileImportStatement(
+    baseFile: string,
+    baseI18nFileNameWithoutExt: string,
+    importT: string,
+) {
     const content = fs.readFileSync(baseFile, 'utf8');
 
-    const importRegex =
-        /import\s*\{\s*i18n\s*\}\s*from\s*['"]\..*\.i18n\.js['"]\s*;/;
-    const requireRegex =
-        /const\s*{\s*i18n\s*}\s*=\s*require\s*\(['"]\..*\.i18n\.js['"]\)\s*;/;
-
-    if (!importRegex.test(content) && !requireRegex.test(content)) {
+    if (!content.includes(baseI18nFileNameWithoutExt)) {
         fs.writeFileSync(baseFile, importT + content);
     }
 }
 
 /**
  * Builds rule which generates i18n files.
- * @param keyLanguage  Language which uses key
- * @param langs        Available languages
- * @param fileExt      I18n file extension
- * @param importType   Type of import and exports
+ * @param keyLanguage - Language which uses key
+ * @param langs - Available languages
+ * @param fileExt - I18n file extension
+ * @param importType - Type of import and exports
  */
 export const createGenerateI18nFileRule = ({
     keyLanguage,
@@ -138,6 +138,12 @@ export const createGenerateI18nFileRule = ({
                     0,
                     context.filename.lastIndexOf('.'),
                 );
+                const baseName = path.basename(context.filename);
+                const baseFileName = baseName.substring(
+                    0,
+                    baseName.lastIndexOf('.'),
+                );
+                const baseI18nFileNameWithoutExt = `${baseFileName}.i18n`;
                 const i18nFileName = `${fileName}.i18n.${fileExt}`;
                 const existingKeyset = loadKeyset(i18nFileName);
                 const updatedKeyset = { ...existingKeyset };
@@ -184,7 +190,8 @@ export const createGenerateI18nFileRule = ({
 
                     addI18nFileImportStatement(
                         context.filename,
-                        getImportFromI18nFileT(path.basename(i18nFileName)),
+                        baseI18nFileNameWithoutExt,
+                        getImportFromI18nFileT(baseI18nFileNameWithoutExt),
                     );
                 }
             },

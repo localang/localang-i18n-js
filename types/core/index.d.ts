@@ -15,6 +15,6 @@ export declare class Api {
     settings: Settings;
     constructor();
     setSettings(settings: Partial<Settings>): void;
-    makeI18n(keyset: Keyset, placeholders?: Record<string, string | number>): (key: string) => string;
+    makeI18n(keyset: Keyset): (key: string, placeholders?: Record<string, string | number> | undefined) => string;
 }
 //# sourceMappingURL=index.d.ts.map

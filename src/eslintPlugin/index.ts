@@ -35,14 +35,6 @@ export const createEslintPlugin = ({
     fileExt = 'js',
     importType = 'module',
 }: Config = {}): ESLint.Plugin => ({
-    // TODO: will it work instead of `ignores` in index.test.eslint.config.js?
-    configs: {
-        generateI18nFile: [
-            {
-                ignores: ['**/*.i18n.*'],
-            },
-        ],
-    },
     rules: {
         'generate-i18n-file': createGenerateI18nFileRule({
             keyLanguage,
