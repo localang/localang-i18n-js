@@ -8,15 +8,21 @@ import type { Keyset } from '../core/builder/types';
  */
 const sync = (files: Array<{ filePath: string; keyset: Keyset }>) => {
     files.forEach(({ filePath, keyset }) => {
-        if (!fs.existsSync(filePath)) {
-            console.log(`File ${filePath} doesn't exist`);
+        const filePathSplit = filePath.split('.');
+        filePathSplit[filePathSplit.length - 1] = `i18n.${filePathSplit.at(
+            -1,
+        )}`;
+        const i18nFilePath = filePathSplit.join('.');
+
+        if (!fs.existsSync(i18nFilePath)) {
+            console.log(`File ${i18nFilePath} doesn't exist`);
             return;
         }
 
-        fs.readFile(filePath, 'utf8', (err, data) => {
+        fs.readFile(i18nFilePath, 'utf8', (err, data) => {
             if (err) {
                 throw new Error(
-                    `Error reading file ${filePath}: ${err.message}`,
+                    `Error reading file ${i18nFilePath}: ${err.message}`,
                 );
             }
 
@@ -30,7 +36,7 @@ const sync = (files: Array<{ filePath: string; keyset: Keyset }>) => {
                 `const keyset = ${newObjectString};`,
             );
 
-            fs.writeFileSync(filePath, updatedCodeString);
+            fs.writeFileSync(i18nFilePath, updatedCodeString);
         });
     });
 };
@@ -43,7 +49,7 @@ const sync = (files: Array<{ filePath: string; keyset: Keyset }>) => {
 export const pull = (authToken: string, projectId: number) => {
     const req = https.request(
         {
-            hostname: 'https://localang.xyz',
+            hostname: 'localang.xyz',
             port: 443,
             path: `/api/translations/getAll?project_id=${projectId}`,
             method: 'GET',

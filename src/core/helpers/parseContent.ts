@@ -15,7 +15,6 @@ export const parseContent = (baseContent: string): Keyset => {
     // remove export
     content = content.substring(0, content.lastIndexOf('\n'));
     content = content.substring(0, content.lastIndexOf('\n'));
-    content = content.substring(0, content.lastIndexOf('\n'));
 
     let parsed = {};
 

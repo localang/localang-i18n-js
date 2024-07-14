@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import https from 'https';
-import { importKeyset } from '../core';
+import { parseContent } from '../core';
 import type { Keyset } from '../core/builder/types';
 
 /**
@@ -24,24 +24,13 @@ export const push = (authToken: string, projectId: number, files: string[]) => {
         const baseFile = filePath.replace(/\.i18n\./, '.');
 
         if (fs.existsSync(filePath)) {
-            try {
-                const content = await importKeyset(filePath);
+            const baseContent = fs.readFileSync(filePath, 'utf8');
+            const content = parseContent(baseContent);
 
-                requestData[baseFile] = {
-                    operation: 'update',
-                    translations: content,
-                };
-            } catch (parseError: unknown) {
-                throw new Error(
-                    `Error parsing JSON in file ${file}: ${
-                        typeof parseError === 'object' &&
-                        parseError !== null &&
-                        'message' in parseError
-                            ? parseError.message
-                            : ''
-                    }`,
-                );
-            }
+            requestData[baseFile] = {
+                operation: 'update',
+                translations: content,
+            };
         } else {
             requestData[baseFile] = {
                 operation: 'delete',
@@ -51,7 +40,7 @@ export const push = (authToken: string, projectId: number, files: string[]) => {
 
     const req = https.request(
         {
-            hostname: 'https://localang.xyz',
+            hostname: 'localang.xyz',
             port: 443,
             path: '/api/translations/update',
             method: 'POST',
@@ -77,10 +66,12 @@ export const push = (authToken: string, projectId: number, files: string[]) => {
         },
     );
 
-    req.write({
-        project_id: projectId,
-        files: requestData,
-    });
+    req.write(
+        JSON.stringify({
+            project_id: projectId,
+            files: requestData,
+        }),
+    );
 
     req.on('error', function (e) {
         throw new Error(`Error syncing keysets: ${e.message}`);

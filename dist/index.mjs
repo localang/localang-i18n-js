@@ -125,35 +125,6 @@ var makeI18n$1 = function (lang, keyset) {
 };
 
 /**
- * Imports keyset from i18n file.
- * @param filePath - Path to file.
- * @returns - Keyset.
- */
-var importKeyset = function (filePath) { return __awaiter(void 0, void 0, void 0, function () {
-    var keyset, module_1, error_1;
-    var _a;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                keyset = {};
-                _b.label = 1;
-            case 1:
-                _b.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, import(filePath)];
-            case 2:
-                module_1 = _b.sent();
-                keyset = (_a = module_1.keyset) !== null && _a !== void 0 ? _a : {};
-                return [3 /*break*/, 4];
-            case 3:
-                error_1 = _b.sent();
-                console.log("Reading error: ".concat(error_1));
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/, keyset];
-        }
-    });
-}); };
-
-/**
  * Parses content from i18n file.
  * @param baseContent - Base string content.
  * @returns - Keyset.
@@ -164,7 +135,6 @@ var parseContent = function (baseContent) {
     // remove import
     content = content.substring(content.indexOf('\n') + 1);
     // remove export
-    content = content.substring(0, content.lastIndexOf('\n'));
     content = content.substring(0, content.lastIndexOf('\n'));
     content = content.substring(0, content.lastIndexOf('\n'));
     var parsed = {};
@@ -373,18 +343,21 @@ var createEslintPlugin = function (_a) {
 var sync = function (files) {
     files.forEach(function (_a) {
         var filePath = _a.filePath, keyset = _a.keyset;
-        if (!fs.existsSync(filePath)) {
-            console.log("File ".concat(filePath, " doesn't exist"));
+        var filePathSplit = filePath.split('.');
+        filePathSplit[filePathSplit.length - 1] = "i18n.".concat(filePathSplit.at(-1));
+        var i18nFilePath = filePathSplit.join('.');
+        if (!fs.existsSync(i18nFilePath)) {
+            console.log("File ".concat(i18nFilePath, " doesn't exist"));
             return;
         }
-        fs.readFile(filePath, 'utf8', function (err, data) {
+        fs.readFile(i18nFilePath, 'utf8', function (err, data) {
             if (err) {
-                throw new Error("Error reading file ".concat(filePath, ": ").concat(err.message));
+                throw new Error("Error reading file ".concat(i18nFilePath, ": ").concat(err.message));
             }
             var newObjectString = JSON.stringify(keyset, null, 4).replace(/"(\w+)":/g, '$1:');
             var regex = /const keyset = {[\s\S]*?};/;
             var updatedCodeString = data.replace(regex, "const keyset = ".concat(newObjectString, ";"));
-            fs.writeFileSync(filePath, updatedCodeString);
+            fs.writeFileSync(i18nFilePath, updatedCodeString);
         });
     });
 };
@@ -395,7 +368,7 @@ var sync = function (files) {
  */
 var pull = function (authToken, projectId) {
     var req = https.request({
-        hostname: 'https://localang.xyz',
+        hostname: 'localang.xyz',
         port: 443,
         path: "/api/translations/getAll?project_id=".concat(projectId),
         method: 'GET',
@@ -431,43 +404,28 @@ var pull = function (authToken, projectId) {
 var push = function (authToken, projectId, files) {
     var requestData = {};
     files.forEach(function (file) { return __awaiter(void 0, void 0, void 0, function () {
-        var filePath, baseFile, content, parseError_1;
+        var filePath, baseFile, baseContent, content;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    filePath = path.resolve(process.cwd(), file);
-                    baseFile = filePath.replace(/\.i18n\./, '.');
-                    if (!fs.existsSync(filePath)) return [3 /*break*/, 5];
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, importKeyset(filePath)];
-                case 2:
-                    content = _a.sent();
-                    requestData[baseFile] = {
-                        operation: 'update',
-                        translations: content,
-                    };
-                    return [3 /*break*/, 4];
-                case 3:
-                    parseError_1 = _a.sent();
-                    throw new Error("Error parsing JSON in file ".concat(file, ": ").concat(typeof parseError_1 === 'object' &&
-                        parseError_1 !== null &&
-                        'message' in parseError_1
-                        ? parseError_1.message
-                        : ''));
-                case 4: return [3 /*break*/, 6];
-                case 5:
-                    requestData[baseFile] = {
-                        operation: 'delete',
-                    };
-                    _a.label = 6;
-                case 6: return [2 /*return*/];
+            filePath = path.resolve(process.cwd(), file);
+            baseFile = filePath.replace(/\.i18n\./, '.');
+            if (fs.existsSync(filePath)) {
+                baseContent = fs.readFileSync(filePath, 'utf8');
+                content = parseContent(baseContent);
+                requestData[baseFile] = {
+                    operation: 'update',
+                    translations: content,
+                };
             }
+            else {
+                requestData[baseFile] = {
+                    operation: 'delete',
+                };
+            }
+            return [2 /*return*/];
         });
     }); });
     var req = https.request({
-        hostname: 'https://localang.xyz',
+        hostname: 'localang.xyz',
         port: 443,
         path: '/api/translations/update',
         method: 'POST',
@@ -487,10 +445,10 @@ var push = function (authToken, projectId, files) {
             }
         });
     });
-    req.write({
+    req.write(JSON.stringify({
         project_id: projectId,
         files: requestData,
-    });
+    }));
     req.on('error', function (e) {
         throw new Error("Error syncing keysets: ".concat(e.message));
     });

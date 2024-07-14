@@ -30,7 +30,6 @@ const content = `import { makeI18n } from 'localang-i18n-js';
 const keyset = ${JSON.stringify(keyset, null, 4)};
 
 export i18n = makeI18n(keyset);
-export { keyset };
 `;
 
 describe('core/helpers/parseContent', () => {

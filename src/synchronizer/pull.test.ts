@@ -15,7 +15,8 @@ const exampleKeyset: Keyset = {
 
 describe('synchronizer/pull', () => {
     const authToken = 'test-token';
-    const exampleFilePath = 'path/to/example.i18n.js';
+    const exampleFilePath = 'path/to/example.js';
+    const exampleI18nFilePath = 'path/to/example.i18n.js';
     const exampleFiles = [
         {
             filePath: exampleFilePath,
@@ -67,7 +68,7 @@ describe('synchronizer/pull', () => {
         process.nextTick(() => {
             expect(https.request).toHaveBeenCalledWith(
                 {
-                    hostname: 'https://localang.xyz',
+                    hostname: 'localang.xyz',
                     port: 443,
                     path: '/api/translations/getAll?project_id=1',
                     method: 'GET',
@@ -85,14 +86,14 @@ describe('synchronizer/pull', () => {
             );
             expect(request.end).toHaveBeenCalled();
 
-            expect(fs.existsSync).toHaveBeenCalledWith(exampleFilePath);
+            expect(fs.existsSync).toHaveBeenCalledWith(exampleI18nFilePath);
             expect(fs.readFile).toHaveBeenCalledWith(
-                exampleFilePath,
+                exampleI18nFilePath,
                 'utf8',
                 expect.any(Function),
             );
             expect(fs.writeFileSync).toHaveBeenCalledWith(
-                exampleFilePath,
+                exampleI18nFilePath,
                 expect.stringContaining(
                     'const keyset = {\n    "What is love?": {\n        en: "What is love?",\n        ru: "Что такое любовь?"\n    }\n};',
                 ),
@@ -136,7 +137,7 @@ describe('synchronizer/pull', () => {
         pull(authToken, 1);
 
         process.nextTick(() => {
-            expect(fs.existsSync).toHaveBeenCalledWith(exampleFilePath);
+            expect(fs.existsSync).toHaveBeenCalledWith(exampleI18nFilePath);
             expect(fs.readFile).not.toHaveBeenCalled();
 
             done();
@@ -187,7 +188,7 @@ describe('synchronizer/pull', () => {
 
         process.nextTick(() => {
             expect(fs.readFile).toHaveBeenCalledWith(
-                exampleFilePath,
+                exampleI18nFilePath,
                 'utf8',
                 expect.any(Function),
             );

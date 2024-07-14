@@ -2,12 +2,12 @@ import path from 'path';
 import fs from 'fs';
 import https from 'https';
 import { push } from './push';
-import { importKeyset } from '../core';
+import { parseContent } from '../core';
 
 jest.mock('fs');
 jest.mock('https');
 jest.mock('../core', () => ({
-    importKeyset: jest.fn(),
+    parseContent: jest.fn(),
 }));
 
 describe('synchronizer/push', () => {
@@ -27,7 +27,7 @@ describe('synchronizer/push', () => {
             (filePath) => filePath === resolvedFile1Path,
         );
 
-        (importKeyset as jest.Mock).mockImplementation(() => ({
+        (parseContent as jest.Mock).mockImplementation(() => ({
             key: 'value',
         }));
 
@@ -60,7 +60,7 @@ describe('synchronizer/push', () => {
         process.nextTick(() => {
             expect(https.request).toHaveBeenCalledWith(
                 {
-                    hostname: 'https://localang.xyz',
+                    hostname: 'localang.xyz',
                     port: 443,
                     path: '/api/translations/update',
                     method: 'POST',
@@ -76,21 +76,23 @@ describe('synchronizer/push', () => {
                 'error',
                 expect.any(Function),
             );
-            expect(request.write).toHaveBeenCalledWith({
-                project_id: 1,
-                files: {
-                    [baseFile1]: {
-                        operation: 'update',
-                        translations: { key: 'value' },
+            expect(request.write).toHaveBeenCalledWith(
+                JSON.stringify({
+                    project_id: 1,
+                    files: {
+                        [baseFile1]: {
+                            operation: 'update',
+                            translations: { key: 'value' },
+                        },
+                        [baseFile2]: {
+                            operation: 'delete',
+                        },
                     },
-                    [baseFile2]: {
-                        operation: 'delete',
-                    },
-                },
-            });
+                }),
+            );
             expect(request.end).toHaveBeenCalled();
 
-            expect(importKeyset).toHaveBeenCalledWith(resolvedFile1Path);
+            expect(parseContent).toHaveBeenCalled();
 
             expect(fs.existsSync).toHaveBeenCalledWith(resolvedFile1Path);
             expect(fs.existsSync).toHaveBeenCalledWith(resolvedFile2Path);
@@ -131,7 +133,7 @@ describe('synchronizer/push', () => {
         process.nextTick(() => {
             expect(https.request).toHaveBeenCalledWith(
                 {
-                    hostname: 'https://localang.xyz',
+                    hostname: 'localang.xyz',
                     port: 443,
                     path: '/api/translations/update',
                     method: 'POST',
@@ -147,16 +149,18 @@ describe('synchronizer/push', () => {
                 'error',
                 expect.any(Function),
             );
-            expect(request.write).toHaveBeenCalledWith({
-                project_id: 1,
-                files: {
-                    [baseFile1]: { operation: 'delete' },
-                    [baseFile2]: { operation: 'delete' },
-                },
-            });
+            expect(request.write).toHaveBeenCalledWith(
+                JSON.stringify({
+                    project_id: 1,
+                    files: {
+                        [baseFile1]: { operation: 'delete' },
+                        [baseFile2]: { operation: 'delete' },
+                    },
+                }),
+            );
             expect(request.end).toHaveBeenCalled();
 
-            expect(importKeyset).not.toHaveBeenCalled();
+            expect(parseContent).not.toHaveBeenCalled();
 
             expect(fs.existsSync).toHaveBeenCalledWith(resolvedFile1Path);
             expect(fs.existsSync).toHaveBeenCalledWith(resolvedFile2Path);
