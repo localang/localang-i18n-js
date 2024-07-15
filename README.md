@@ -17,7 +17,7 @@ yarn add localang-i18n-js
 
 ## Documentation
 
-[Documentation](https://localang.xyz/docs/i18n-js/getting-started).
+[Documentation](https://docs.localang.xyz/docs/i18n-js/getting-started).
 
 ## License
 
