@@ -1,5 +1,5 @@
 /*!
- * localang-i18n-js v0.0.1
+ * localang-i18n-js v0.0.2
  * (c) Localang
  * Released under the MIT License.
  */

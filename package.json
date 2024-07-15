@@ -1,6 +1,6 @@
 {
     "name": "localang-i18n-js",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "",
     "scripts": {
         "doc": "typedoc src/index.ts",
