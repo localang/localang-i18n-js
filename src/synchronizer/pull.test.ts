@@ -95,7 +95,7 @@ describe('synchronizer/pull', () => {
             expect(fs.writeFileSync).toHaveBeenCalledWith(
                 exampleI18nFilePath,
                 expect.stringContaining(
-                    'const keyset = {\n    "What is love?": {\n        en: "What is love?",\n        ru: "Что такое любовь?"\n    }\n};',
+                    'const keyset = {\n    "What is love?": {\n        "en": "What is love?",\n        "ru": "Что такое любовь?"\n    }\n};',
                 ),
             );
 

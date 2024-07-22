@@ -13,10 +13,10 @@ jest.mock('../core', () => ({
 describe('synchronizer/push', () => {
     const authToken = 'test-token';
     const files = ['file1.i18n.js', 'file2.i18n.js'];
+    const file1Name = 'file1.js';
+    const file2Name = 'file2.js';
     const resolvedFile1Path = path.resolve(process.cwd(), 'file1.i18n.js');
     const resolvedFile2Path = path.resolve(process.cwd(), 'file2.i18n.js');
-    const baseFile1 = resolvedFile1Path.replace(/\.i18n\./, '.');
-    const baseFile2 = resolvedFile2Path.replace(/\.i18n\./, '.');
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -80,11 +80,11 @@ describe('synchronizer/push', () => {
                 JSON.stringify({
                     project_id: 1,
                     files: {
-                        [baseFile1]: {
+                        [file1Name]: {
                             operation: 'update',
                             translations: { key: 'value' },
                         },
-                        [baseFile2]: {
+                        [file2Name]: {
                             operation: 'delete',
                         },
                     },
@@ -153,8 +153,8 @@ describe('synchronizer/push', () => {
                 JSON.stringify({
                     project_id: 1,
                     files: {
-                        [baseFile1]: { operation: 'delete' },
-                        [baseFile2]: { operation: 'delete' },
+                        [file1Name]: { operation: 'delete' },
+                        [file2Name]: { operation: 'delete' },
                     },
                 }),
             );

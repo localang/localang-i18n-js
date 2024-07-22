@@ -26,10 +26,7 @@ const sync = (files: Array<{ filePath: string; keyset: Keyset }>) => {
                 );
             }
 
-            const newObjectString = JSON.stringify(keyset, null, 4).replace(
-                /"(\w+)":/g,
-                '$1:',
-            );
+            const newObjectString = JSON.stringify(keyset, null, 4);
             const regex = /const keyset = {[\s\S]*?};/;
             const updatedCodeString = data.replace(
                 regex,

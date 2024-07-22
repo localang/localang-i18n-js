@@ -32,7 +32,7 @@ Creates ESLint plugin to generate I18n files.
 
 #### Defined in
 
-[eslintPlugin/index.ts:32](https://github.com/localang/localang-i18n-js/blob/01298b2/src/eslintPlugin/index.ts#L32)
+[eslintPlugin/index.ts:32](https://github.com/localang/localang-i18n-js/blob/a227353/src/eslintPlugin/index.ts#L32)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 #### Defined in
 
-[core/index.ts:37](https://github.com/localang/localang-i18n-js/blob/01298b2/src/core/index.ts#L37)
+[core/index.ts:37](https://github.com/localang/localang-i18n-js/blob/a227353/src/core/index.ts#L37)
 
 ___
 
@@ -75,7 +75,7 @@ Loads translations from localang.xyz and updates local files.
 
 #### Defined in
 
-[synchronizer/pull.ts:49](https://github.com/localang/localang-i18n-js/blob/01298b2/src/synchronizer/pull.ts#L49)
+[synchronizer/pull.ts:46](https://github.com/localang/localang-i18n-js/blob/a227353/src/synchronizer/pull.ts#L46)
 
 ___
 
@@ -99,7 +99,7 @@ Uploads local translations to localang.xyz.
 
 #### Defined in
 
-[synchronizer/push.ts:13](https://github.com/localang/localang-i18n-js/blob/01298b2/src/synchronizer/push.ts#L13)
+[synchronizer/push.ts:13](https://github.com/localang/localang-i18n-js/blob/a227353/src/synchronizer/push.ts#L13)
 
 ___
 
@@ -119,4 +119,4 @@ ___
 
 #### Defined in
 
-[core/index.ts:30](https://github.com/localang/localang-i18n-js/blob/01298b2/src/core/index.ts#L30)
+[core/index.ts:30](https://github.com/localang/localang-i18n-js/blob/a227353/src/core/index.ts#L30)

@@ -1,5 +1,5 @@
 /*!
- * localang-i18n-js v0.0.3
+ * localang-i18n-js v0.0.4
  * (c) Localang
  * Released under the MIT License.
  */
@@ -354,7 +354,7 @@ var sync = function (files) {
             if (err) {
                 throw new Error("Error reading file ".concat(i18nFilePath, ": ").concat(err.message));
             }
-            var newObjectString = JSON.stringify(keyset, null, 4).replace(/"(\w+)":/g, '$1:');
+            var newObjectString = JSON.stringify(keyset, null, 4);
             var regex = /const keyset = {[\s\S]*?};/;
             var updatedCodeString = data.replace(regex, "const keyset = ".concat(newObjectString, ";"));
             fs.writeFileSync(i18nFilePath, updatedCodeString);
@@ -407,7 +407,7 @@ var push = function (authToken, projectId, files) {
         var filePath, baseFile, baseContent, content;
         return __generator(this, function (_a) {
             filePath = path.resolve(process.cwd(), file);
-            baseFile = filePath.replace(/\.i18n\./, '.');
+            baseFile = file.replace(/\.i18n\./, '.');
             if (fs.existsSync(filePath)) {
                 baseContent = fs.readFileSync(filePath, 'utf8');
                 content = parseContent(baseContent);

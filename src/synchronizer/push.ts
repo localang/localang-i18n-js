@@ -21,7 +21,7 @@ export const push = (authToken: string, projectId: number, files: string[]) => {
 
     files.forEach(async (file) => {
         const filePath = path.resolve(process.cwd(), file);
-        const baseFile = filePath.replace(/\.i18n\./, '.');
+        const baseFile = file.replace(/\.i18n\./, '.');
 
         if (fs.existsSync(filePath)) {
             const baseContent = fs.readFileSync(filePath, 'utf8');
