@@ -5,6 +5,8 @@
 Internationalize your JS projects without paying attention to it.
 Increase your productivity with this library, which includes an ESLint rule to automatically generate files with keys and default translations. Just use `i18n('Your text')` in your code, and let the library handle the rest!
 
+![Example](readme-example.gif)
+
 ## Installation
 
 This library is published in the NPM registry and can be installed using any compatible package manager.

@@ -1,7 +1,7 @@
 {
     "name": "localang-i18n-js",
-    "version": "0.0.4",
-    "description": "",
+    "version": "0.0.5",
+    "description": "Internationalize your JS projects easy",
     "scripts": {
         "doc": "typedoc src/index.ts",
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
