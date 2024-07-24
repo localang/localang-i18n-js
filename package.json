@@ -62,7 +62,9 @@
         "url": "git+https://github.com/localang/localang-i18n-js.git"
     },
     "keywords": [
-        "eslint",
+        "localization",
+        "i18n",
+        "internationalization",
         "eslintplugin",
         "eslint-plugin"
     ],
