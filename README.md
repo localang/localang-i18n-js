@@ -2,7 +2,7 @@
 
 [![Continuous Integrations](https://github.com/localang/localang-i18n-js/actions/workflows/continuous-integrations.yaml/badge.svg?branch=main)](https://github.com/localang/localang-i18n-js/actions/workflows/continuous-integrations.yaml)
 
-Internationalize your JS projects without paying attention to it.
+As a developer, you don't have to think about localization.
 Increase your productivity with this library, which includes an ESLint rule to automatically generate files with keys and default translations. Just use `i18n('Your text')` in your code, and let the library handle the rest!
 
 ![Example](readme-example.gif)

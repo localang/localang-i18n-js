@@ -22,9 +22,15 @@ export interface Config {
      * @default module
      */
     importType?: 'module' | 'commonjs';
+    /**
+     * Automatically adds import i18n-function from a translation file.
+     * May not work as expected in IDE with ESLint auto-correct via save
+     * @default false
+     */
+    addI18nImportToBaseFile?: boolean;
 }
 /**
  * Creates ESLint plugin to generate I18n files.
  */
-export declare const createEslintPlugin: ({ keyLanguage, langs, fileExt, importType, }?: Config) => ESLint.Plugin;
+export declare const createEslintPlugin: ({ keyLanguage, langs, fileExt, importType, addI18nImportToBaseFile, }?: Config) => ESLint.Plugin;
 //# sourceMappingURL=index.d.ts.map

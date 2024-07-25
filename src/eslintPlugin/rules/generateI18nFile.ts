@@ -113,6 +113,7 @@ export const createGenerateI18nFileRule = ({
     langs,
     fileExt,
     importType,
+    addI18nImportToBaseFile,
 }: Required<Config>): Rule.RuleModule => ({
     create(context) {
         const usedKeys: Set<string> = new Set();
@@ -188,11 +189,13 @@ export const createGenerateI18nFileRule = ({
                         exportT,
                     });
 
-                    addI18nFileImportStatement(
-                        context.filename,
-                        baseI18nFileNameWithoutExt,
-                        getImportFromI18nFileT(baseI18nFileNameWithoutExt),
-                    );
+                    if (addI18nImportToBaseFile) {
+                        addI18nFileImportStatement(
+                            context.filename,
+                            baseI18nFileNameWithoutExt,
+                            getImportFromI18nFileT(baseI18nFileNameWithoutExt),
+                        );
+                    }
                 }
             },
         };

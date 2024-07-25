@@ -24,6 +24,12 @@ export interface Config {
      * @default module
      */
     importType?: 'module' | 'commonjs';
+    /**
+     * Automatically adds import i18n-function from a translation file.
+     * May not work as expected in IDE with ESLint auto-correct via save
+     * @default false
+     */
+    addI18nImportToBaseFile?: boolean;
 }
 
 /**
@@ -34,6 +40,7 @@ export const createEslintPlugin = ({
     langs = ['en'],
     fileExt = 'js',
     importType = 'module',
+    addI18nImportToBaseFile = false,
 }: Config = {}): ESLint.Plugin => ({
     rules: {
         'generate-i18n-file': createGenerateI18nFileRule({
@@ -41,6 +48,7 @@ export const createEslintPlugin = ({
             langs,
             fileExt,
             importType,
+            addI18nImportToBaseFile,
         }),
     },
 });

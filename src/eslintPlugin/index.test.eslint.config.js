@@ -13,6 +13,7 @@ const config = [
         plugins: {
             localang: createEslintPlugin({
                 langs,
+                addI18nImportToBaseFile: true,
             }),
         },
         rules: {

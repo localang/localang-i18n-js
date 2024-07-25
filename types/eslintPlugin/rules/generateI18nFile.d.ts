@@ -7,5 +7,5 @@ import type { Config } from '../index';
  * @param fileExt - I18n file extension
  * @param importType - Type of import and exports
  */
-export declare const createGenerateI18nFileRule: ({ keyLanguage, langs, fileExt, importType, }: Required<Config>) => Rule.RuleModule;
+export declare const createGenerateI18nFileRule: ({ keyLanguage, langs, fileExt, importType, addI18nImportToBaseFile, }: Required<Config>) => Rule.RuleModule;
 //# sourceMappingURL=generateI18nFile.d.ts.map

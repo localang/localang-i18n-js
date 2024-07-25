@@ -1,5 +1,5 @@
 /*!
- * localang-i18n-js v0.0.5
+ * localang-i18n-js v0.0.6
  * (c) Localang
  * Released under the MIT License.
  */
@@ -253,7 +253,7 @@ function addI18nFileImportStatement(baseFile, baseI18nFileNameWithoutExt, import
  * @param importType - Type of import and exports
  */
 var createGenerateI18nFileRule = function (_a) {
-    var keyLanguage = _a.keyLanguage, langs = _a.langs, fileExt = _a.fileExt, importType = _a.importType;
+    var keyLanguage = _a.keyLanguage, langs = _a.langs, fileExt = _a.fileExt, importType = _a.importType, addI18nImportToBaseFile = _a.addI18nImportToBaseFile;
     return ({
         create: function (context) {
             var usedKeys = new Set();
@@ -313,7 +313,9 @@ var createGenerateI18nFileRule = function (_a) {
                             importT: importT,
                             exportT: exportT,
                         });
-                        addI18nFileImportStatement(context.filename, baseI18nFileNameWithoutExt, getImportFromI18nFileT(baseI18nFileNameWithoutExt));
+                        if (addI18nImportToBaseFile) {
+                            addI18nFileImportStatement(context.filename, baseI18nFileNameWithoutExt, getImportFromI18nFileT(baseI18nFileNameWithoutExt));
+                        }
                     }
                 },
             };
@@ -325,7 +327,7 @@ var createGenerateI18nFileRule = function (_a) {
  * Creates ESLint plugin to generate I18n files.
  */
 var createEslintPlugin = function (_a) {
-    var _b = _a === void 0 ? {} : _a, _c = _b.keyLanguage, keyLanguage = _c === void 0 ? 'en' : _c, _d = _b.langs, langs = _d === void 0 ? ['en'] : _d, _e = _b.fileExt, fileExt = _e === void 0 ? 'js' : _e, _f = _b.importType, importType = _f === void 0 ? 'module' : _f;
+    var _b = _a === void 0 ? {} : _a, _c = _b.keyLanguage, keyLanguage = _c === void 0 ? 'en' : _c, _d = _b.langs, langs = _d === void 0 ? ['en'] : _d, _e = _b.fileExt, fileExt = _e === void 0 ? 'js' : _e, _f = _b.importType, importType = _f === void 0 ? 'module' : _f, _g = _b.addI18nImportToBaseFile, addI18nImportToBaseFile = _g === void 0 ? false : _g;
     return ({
         rules: {
             'generate-i18n-file': createGenerateI18nFileRule({
@@ -333,6 +335,7 @@ var createEslintPlugin = function (_a) {
                 langs: langs,
                 fileExt: fileExt,
                 importType: importType,
+                addI18nImportToBaseFile: addI18nImportToBaseFile,
             }),
         },
     });

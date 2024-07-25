@@ -1,6 +1,6 @@
 {
     "name": "localang-i18n-js",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Internationalize your JS projects easy",
     "scripts": {
         "doc": "typedoc src/index.ts",
