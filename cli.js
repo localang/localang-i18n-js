@@ -11,31 +11,46 @@ const parseArgs = () => {
     }
 
     const operation = args[0];
+    const authToken = args[1];
+    const projectId = args[2];
+    const files = args[3];
 
     if (!['push', 'pull'].includes(operation)) {
         console.log('Error: The first argument must be equal to "pull" or "push"');
         process.exit();
     }
 
-    if (operation === 'push' && !args[1]) {
-        console.log('Error: To push the changes, the i18n files should be listed comma separated as second argument: src/path/getName.i18n.ts,src/index.i18n.ts');
+    if (!authToken) {
+        console.log('Error: The second argument is to pass an authorization token to Localang');
+        process.exit();
+    }
+
+    if (!projectId) {
+        console.log('Error: The third argument is to pass the project ID to Localang');
+        process.exit();
+    }
+
+    if (operation === 'push' && !files) {
+        console.log('Error: To push the changes, the i18n files should be listed comma separated as fourth argument: src/path/getName.i18n.ts,src/index.i18n.ts');
         process.exit();
     }
 
     return {
-        operation: args[0],
-        files: args[1]?.split(',').map(s => s.trim()) ?? [],
+        operation,
+        authToken,
+        projectId,
+        files: files?.split(',').map(s => s.trim()) ?? [],
     };
 };
 
-const { operation, files } = parseArgs();
+const { operation, authToken, projectId, files } = parseArgs();
 
 switch (operation) {
     case 'pull':
-        pull();
+        pull(authToken, projectId);
         break;
 
     case 'push':
-        push(files);
+        push(authToken, projectId, files);
         break;
 }
