@@ -1,6 +1,6 @@
 {
     "name": "localang-i18n-js",
-    "version": "0.0.7",
+    "version": "0.1.0",
     "description": "Internationalize your JS projects easy",
     "scripts": {
         "doc": "typedoc src/index.ts",
@@ -22,6 +22,11 @@
         "dist/",
         "types/"
     ],
+    "browser": {
+        "fs": false,
+        "path": false,
+        "os": false
+    },
     "exports": {
         ".": [
             {
@@ -30,7 +35,8 @@
                 "default": "./dist/index.js"
             },
             "./dist/index.js"
-        ]
+        ],
+        "./babel/remove-unused-languages.js": "./babelPlugin/remove-unused-languages.js"
     },
     "devDependencies": {
         "@rollup/plugin-terser": "^0.4.3",
