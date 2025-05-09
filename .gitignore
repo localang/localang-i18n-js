@@ -9,6 +9,7 @@
 
 # Node.js modules.
 node_modules/
+./vitePlusin/node_modules/
 
 # NPM's shrinkwrap.
 # We're using `package-lock.json` instead.

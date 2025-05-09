@@ -15,6 +15,7 @@ const options = {
             },
         ],
     },
+    modulePathIgnorePatterns: ["./vitePlugin"],
     resolver: 'ts-jest-resolver',
 };
 
