@@ -1,5 +1,5 @@
 /*!
- * localang-i18n-js v0.1.1
+ * localang-i18n-js v0.1.2
  * (c) Localang
  * Released under the MIT License.
  */
@@ -365,9 +365,14 @@ var sync = function (files) {
     });
 };
 /**
- * Loads translations from localang.xyz and updates local files.
- * @param authToken - Authorization token with translations:read permission on localang.xyz.
- * @param projectId - ID of project on localang.xyz.
+ * Loads translations from the hosted Localang service and updates local files.
+ *
+ * @deprecated The hosted Localang service has been discontinued, so this helper no
+ * longer has a working backend to talk to. It is kept for reference only. The i18n
+ * library and ESLint plugin remain fully usable without it.
+ *
+ * @param authToken - Authorization token with translations:read permission.
+ * @param projectId - ID of the project in the (discontinued) service.
  */
 var pull = function (authToken, projectId) {
     var req = https.request({
@@ -399,9 +404,14 @@ var pull = function (authToken, projectId) {
 };
 
 /**
- * Uploads local translations to localang.xyz.
- * @param authToken - Authorization token with translations:update permission on localang.xyz.
- * @param projectId - ID of project on localang.xyz.
+ * Uploads local translations to the hosted Localang service.
+ *
+ * @deprecated The hosted Localang service has been discontinued, so this helper no
+ * longer has a working backend to talk to. It is kept for reference only. The i18n
+ * library and ESLint plugin remain fully usable without it.
+ *
+ * @param authToken - Authorization token with translations:update permission.
+ * @param projectId - ID of the project in the (discontinued) service.
  * @param files - I18n files from which translations should be used.
  */
 var push = function (authToken, projectId, files) {

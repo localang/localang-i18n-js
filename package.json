@@ -1,6 +1,6 @@
 {
     "name": "localang-i18n-js",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Internationalize your JS projects easy",
     "scripts": {
         "doc": "typedoc src/index.ts",
@@ -66,7 +66,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/localang/localang-i18n-js.git"
+        "url": "git+https://github.com/pavelpilyak/localang-i18n-js.git"
     },
     "keywords": [
         "localization",
@@ -80,9 +80,9 @@
     },
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/localang/localang-i18n-js/issues"
+        "url": "https://github.com/pavelpilyak/localang-i18n-js/issues"
     },
-    "homepage": "https://github.com/localang/localang-i18n-js#readme",
+    "homepage": "https://github.com/pavelpilyak/localang-i18n-js#readme",
     "dependencies": {
         "rollup-plugin-copy": "^3.5.0"
     }
